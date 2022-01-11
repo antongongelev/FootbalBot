@@ -137,7 +137,7 @@ public class Team {
     public void removeFriends(String player, int number) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
-            throw new TeamException(player + " хотел сделать -" + number + ", но ему некого убирать");
+            throw new TeamException(player + " хотел сделать -" + number + ", но он столько не звал");
         } else {
             if (playerData.getCalledPlayers() - number < 0) {
                 throw new TeamException(player + " хотел сделать -" + number + ", но он столько не звал");
