@@ -1,7 +1,6 @@
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
@@ -9,25 +8,28 @@ import java.util.Locale;
 
 public class Team {
 
-    private final LocalDateTime date = LocalDateTime.now();
     private final String wednesday = getNearest();
     private final HashMap<String, PlayerData> team = new HashMap<>();
 
-
     private String getNearest() {
-        LocalDate localDate = LocalDate.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+        LocalDate localDate = LocalDate.now();
         LocalDate nearest = localDate.with(TemporalAdjusters.nextOrSame(Constants.DAY_OF_WEEK));
         return nearest.format(DateTimeFormatter.ofPattern("dd MMMM", new Locale("ru")));
     }
 
     public void validateDay() {
-        if (!wednesday.equals(getNearest())) {
-            throw new TeamException("Состав был сброшен. Набираем на " + wednesday);
+        String nearest = getNearest();
+        if (!wednesday.equals(nearest)) {
+            throw new TeamException("Состав на " + wednesday + " был сброшен. Набираем на " + nearest);
         }
     }
 
     public String getFullReport() {
-        return "Состав на " + getWednesday() + ": " + System.lineSeparator() + getPlayers() + "Итого: " + getTotal();
+        return "Состав на " + wednesday + ": " + System.lineSeparator()
+                + Constants.DELIMITER + System.lineSeparator()
+                + getPlayers()
+                + Constants.DELIMITER + System.lineSeparator()
+                + "Итого: " + getTotal();
     }
 
     public String getTotal() {
@@ -51,10 +53,6 @@ public class Team {
 
     private int getDoubt() {
         return (int) team.values().stream().filter(p -> Status.DOES_NOT_KNOW == p.getStatus()).count();
-    }
-
-    public String getWednesday() {
-        return wednesday;
     }
 
     private String getPlayers() {

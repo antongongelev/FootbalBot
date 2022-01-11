@@ -14,4 +14,5 @@ public interface Constants {
     String CHAT_NAME = "333";
     Pattern MINUS_PATTERN = Pattern.compile("[-][1-9]");
     Pattern PLUS_PATTERN = Pattern.compile("[+][1-9]");
+    String DELIMITER = "======================";
 }
