@@ -1,3 +1,5 @@
+package ru.telegrambot;
+
 public class PlayerData {
 
     private Status status = Status.NOT_READY;

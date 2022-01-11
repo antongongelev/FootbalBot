@@ -1,3 +1,5 @@
+package ru.telegrambot;
+
 public enum Status {
 
     READY("готов"),

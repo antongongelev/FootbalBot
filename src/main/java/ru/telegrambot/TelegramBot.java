@@ -1,3 +1,5 @@
+package ru.telegrambot;
+
 import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -8,12 +10,27 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class TelegramBot extends TelegramLongPollingBot {
+
+    private static String CHAT_NAME = StringUtils.EMPTY;
+    private static String BOT_TOKEN = StringUtils.EMPTY;
+    private static String BOT_NAME = StringUtils.EMPTY;
     private Team team = new Team();
 
     public static void main(String[] args) {
         try {
+            CHAT_NAME = args[0];
+            BOT_NAME = args[1];
+            BOT_TOKEN = args[2];
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(new TelegramBot());
+            System.out.println("Bot has been launched with params:");
+            System.out.println("BOT_NAME: " + getBotName());
+            System.out.println("CHAT_NAME: " + getChatName());
+            System.out.println("TOKEN: " + getToken());
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -84,7 +101,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void validateChat(Message message) {
-        if (!"group".equals(message.getChat().getType()) || !Constants.CHAT_NAME.equals(message.getChat().getTitle())) {
+        if (!"group".equals(message.getChat().getType()) || !getChatName().equals(message.getChat().getTitle())) {
             throw new TeamException("Этот бот не предназначен для этого чата");
         }
     }
@@ -142,10 +159,31 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     public String getBotUsername() {
-        return Constants.BOT_NAME;
+        return getBotName();
     }
 
     public String getBotToken() {
-        return Constants.BOT_TOKEN;
+        return getToken();
+    }
+
+    private static String getBotName() {
+        if (StringUtils.isEmpty(BOT_NAME)) {
+            return Constants.BOT_NAME;
+        }
+        return BOT_NAME;
+    }
+
+    private static String getChatName() {
+        if (StringUtils.isEmpty(CHAT_NAME)) {
+            return Constants.CHAT_NAME;
+        }
+        return CHAT_NAME;
+    }
+
+    private static String getToken() {
+        if (StringUtils.isEmpty(BOT_TOKEN)) {
+            return Constants.BOT_TOKEN;
+        }
+        return BOT_TOKEN;
     }
 }
