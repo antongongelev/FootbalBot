@@ -102,7 +102,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void validateChat(Message message) {
         if (!"group".equals(message.getChat().getType()) || !getChatName().equals(message.getChat().getTitle())) {
-            throw new TeamException("Этот бот не предназначен для этого чата");
+            throw new TeamException("Этот бот не предназначен для данного чата");
         }
     }
 
