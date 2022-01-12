@@ -28,8 +28,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(new TelegramBot());
             System.out.println("Bot has been launched with params:");
-            System.out.println("BOT_NAME: " + getBotName());
             System.out.println("CHAT_NAME: " + getChatName());
+            System.out.println("BOT_NAME: " + getBotName());
             System.out.println("TOKEN: " + getToken());
         } catch (TelegramApiException e) {
             e.printStackTrace();
