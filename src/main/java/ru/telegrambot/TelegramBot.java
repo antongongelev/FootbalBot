@@ -57,22 +57,24 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
                 switch (message.getText().replaceAll(" ", "").toUpperCase()) {
                     case Constants.TEAM:
-                        sendMessage(message, getMessage(Constants.TEAM, message));
+                        String teamReport = team.getTeamReport();
+                        sendMessage(message, teamReport);
                         break;
                     case Constants.ADD_ME:
-                        team.addSelf(getFrom(message));
-                        sendMessage(message, getMessage(Constants.ADD_ME, message));
+                        String addSelf = team.addSelf(getFrom(message));
+                        sendMessage(message, addSelf);
                         break;
                     case Constants.DO_NOT_KNOW:
-                        team.doNotKnow(getFrom(message));
-                        sendMessage(message, getMessage(Constants.DO_NOT_KNOW, message));
+                        String doNotKnow = team.doNotKnow(getFrom(message));
+                        sendMessage(message, doNotKnow);
                         break;
                     case Constants.REMOVE_ME:
-                        team.removeMe(getFrom(message));
-                        sendMessage(message, getMessage(Constants.REMOVE_ME, message));
+                        String removeMe = team.removeMe(getFrom(message));
+                        sendMessage(message, removeMe);
                         break;
                     case Constants.HELP:
-                        sendMessage(message, getMessage(Constants.HELP, message));
+                        String help = getHelp();
+                        sendMessage(message, help);
                         break;
                     default:
                         break;
@@ -87,14 +89,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         String formattedText = message.getText().replaceAll(" ", "").toUpperCase();
         if (Constants.PLUS_PATTERN.matcher(formattedText).matches()) {
             int number = Integer.parseInt(formattedText.substring(1));
-            team.addFriends(getFrom(message), number);
-            sendMessage(message, getFrom(message) + " сделал +" + number + ". Итого: " + team.getTotal());
+            String addFriends = team.addFriends(getFrom(message), number);
+            sendMessage(message, addFriends);
             return true;
         }
         if (Constants.MINUS_PATTERN.matcher(formattedText).matches()) {
             int number = Integer.parseInt(formattedText.substring(1));
-            team.removeFriends(getFrom(message), number);
-            sendMessage(message, getFrom(message) + " сделал -" + number + ". Итого: " + team.getTotal());
+            String removeFriends = team.removeFriends(getFrom(message), number);
+            sendMessage(message, removeFriends);
             return true;
         }
         return false;
@@ -106,27 +108,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private String getMessage(String command, Message message) {
-        switch (command) {
-            case Constants.ADD_ME:
-                return getFrom(message) + " вписался. Итого: " + team.getTotal();
-            case Constants.REMOVE_ME:
-                return getFrom(message) + " слился. Итого: " + team.getTotal();
-            case Constants.DO_NOT_KNOW:
-                return getFrom(message) + " под вопросом. Итого: " + team.getTotal();
-            case Constants.TEAM:
-                return team.getFullReport();
-            case Constants.HELP:
-                return getHelp();
-        }
-        return StringUtils.EMPTY;
-    }
-
     private String getHelp() {
         return "Основные команды:" + System.lineSeparator() +
                 "'+' - Идешь сам" + System.lineSeparator() +
                 "'-' - Сливаешься" + System.lineSeparator() +
-                "'?' - Пока под вопросом" + System.lineSeparator() +
+                "'?' - Под вопросом" + System.lineSeparator() +
                 "'+n' - Плюсуешь n друзей (1-9)" + System.lineSeparator() +
                 "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator() +
                 "'Состав' - Узнать состав на ближайшую среду";

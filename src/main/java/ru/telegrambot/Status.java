@@ -2,9 +2,9 @@ package ru.telegrambot;
 
 public enum Status {
 
-    READY("готов"),
-    DOES_NOT_KNOW("под вопросом"),
-    NOT_READY("не готов");
+    READY("Готов"),
+    DOES_NOT_KNOW("Под вопросом"),
+    NOT_READY("Не готов");
 
     private final String status;
 

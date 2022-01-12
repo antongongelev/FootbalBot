@@ -26,7 +26,7 @@ public class Team {
         }
     }
 
-    public String getFullReport() {
+    public String getTeamReport() {
         return "Состав на " + wednesday + ": " + System.lineSeparator()
                 + Constants.DELIMITER + System.lineSeparator()
                 + getPlayers()
@@ -81,49 +81,58 @@ public class Team {
         return player.getKey() + " -> " + player.getValue().getStatus().getStatus() + ". Позвал +" + called + System.lineSeparator();
     }
 
-    public void addSelf(String player) {
+    public String addSelf(String player) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
             PlayerData data = new PlayerData();
             data.setStatus(Status.READY);
             team.put(player, data);
+            return player + " вписался. Итого: " + getTotal();
         } else {
-            if (Status.READY == playerData.getStatus()) {
-                throw new TeamException(player + " попытался вписаться, хотя уже был вписан");
+            Status status = playerData.getStatus();
+            if (Status.READY == status) {
+                return player + " попытался вписаться, хотя уже был вписан";
             }
             playerData.setStatus(Status.READY);
+            return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.READY.getStatus() + "'. Итого: " + getTotal();
         }
     }
 
-    public void doNotKnow(String player) {
+    public String doNotKnow(String player) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
             PlayerData data = new PlayerData();
             data.setStatus(Status.DOES_NOT_KNOW);
             team.put(player, data);
+            return player + " под вопросом. Итого: " + getTotal();
         } else {
-            if (Status.DOES_NOT_KNOW == playerData.getStatus()) {
-                throw new TeamException(player + " попытался поставить 'Под вопросом', хотя уже был под вопросом");
+            Status status = playerData.getStatus();
+            if (Status.DOES_NOT_KNOW == status) {
+                return player + " усомнился что придет, хотя и так не был уверен";
             }
             playerData.setStatus(Status.DOES_NOT_KNOW);
+            return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.DOES_NOT_KNOW.getStatus() + "'. Итого: " + getTotal();
         }
     }
 
-    public void removeMe(String player) {
+    public String removeMe(String player) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
             PlayerData data = new PlayerData();
             data.setStatus(Status.NOT_READY);
             team.put(player, data);
+            return player + " слился. Итого: " + getTotal();
         } else {
-            if (Status.NOT_READY == playerData.getStatus()) {
-                throw new TeamException(player + " попытался слиться, хотя и не собирался приходить");
+            Status status = playerData.getStatus();
+            if (Status.NOT_READY == status) {
+                return player + " попытался слиться, хотя и не собирался приходить";
             }
             playerData.setStatus(Status.NOT_READY);
+            return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.NOT_READY.getStatus() + "'. Итого: " + getTotal();
         }
     }
 
-    public void addFriends(String player, int number) {
+    public String addFriends(String player, int number) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
             PlayerData data = new PlayerData();
@@ -132,17 +141,19 @@ public class Team {
         } else {
             playerData.setCalledPlayers(playerData.getCalledPlayers() + number);
         }
+        return player + " сделал +" + number + ". Итого: " + getTotal();
     }
 
-    public void removeFriends(String player, int number) {
+    public String removeFriends(String player, int number) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
-            throw new TeamException(player + " хотел сделать -" + number + ", но он столько не звал");
+            return player + " хотел сделать -" + number + ", но он столько не звал";
         } else {
             if (playerData.getCalledPlayers() - number < 0) {
-                throw new TeamException(player + " хотел сделать -" + number + ", но он столько не звал");
+                return player + " хотел сделать -" + number + ", но он столько не звал";
             }
             playerData.setCalledPlayers(playerData.getCalledPlayers() - number);
+            return player + " сделал -" + number + ". Итого: " + getTotal();
         }
     }
 }
