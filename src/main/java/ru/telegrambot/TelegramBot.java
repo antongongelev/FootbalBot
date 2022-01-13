@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
@@ -103,7 +104,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void validateChat(Message message) {
-        if (!"group".equals(message.getChat().getType()) || !getChatName().equals(message.getChat().getTitle())) {
+        String type = message.getChat().getType();
+        String title = message.getChat().getTitle();
+        if (!("group".equals(type) || "supergroup".equals(type)) || !getChatName().contains(title)) {
             throw new TeamException("Этот бот не предназначен для данного чата");
         }
     }
@@ -120,12 +123,21 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private String getFrom(Message message) {
         String playerName;
-        String lastName = message.getFrom().getLastName();
-        if (StringUtils.isEmpty(lastName)) {
-            playerName = message.getFrom().getUserName();
+        User user = message.getFrom();
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        String userName = user.getUserName();
+
+        if (StringUtils.isNotEmpty(firstName) && StringUtils.isNotEmpty(lastName)) {
+            playerName = firstName + " " + lastName;
+        } else if (StringUtils.isNotEmpty(userName)) {
+            playerName = userName;
+        } else if (StringUtils.isNotEmpty(firstName)) {
+            playerName = firstName;
         } else {
-            playerName = message.getFrom().getLastName() + " " + message.getFrom().getFirstName();
+            playerName = lastName;
         }
+
         String s1 = playerName.replaceAll("_", "-");
         String s2 = s1.replaceAll("@", "-");
         return s2.replaceAll("&", "-");
