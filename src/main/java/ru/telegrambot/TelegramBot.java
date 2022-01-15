@@ -1,6 +1,7 @@
 package ru.telegrambot;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,11 +11,16 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import java.util.Random;
+
 public class TelegramBot extends TelegramLongPollingBot {
 
     private static String CHAT_NAME = StringUtils.EMPTY;
     private static String BOT_TOKEN = StringUtils.EMPTY;
     private static String BOT_NAME = StringUtils.EMPTY;
+    private static String CLEAR_CODE = StringUtils.EMPTY;
+    private static long CLEAR_TIMESTAMP = 0L;
+
     private Team team = new Team();
 
     public static void main(String[] args) {
@@ -53,6 +59,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                 sendMessage(message, e.getLocalizedMessage());
             }
             try {
+                if (isClearCode(message)) {
+                    processClear(message);
+                    return;
+                }
                 if (processFriends(message)) {
                     return;
                 }
@@ -77,6 +87,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                         String help = getHelp();
                         sendMessage(message, help);
                         break;
+                    case Constants.CLEAR:
+                        CLEAR_CODE = generateCode();
+                        CLEAR_TIMESTAMP = System.currentTimeMillis();
+                        sendMessage(message, "Для сброса состава отправьте код '" + CLEAR_CODE + "' в течение минуты");
+                        break;
                     default:
                         break;
                 }
@@ -84,6 +99,27 @@ public class TelegramBot extends TelegramLongPollingBot {
                 sendMessage(message, e.getLocalizedMessage());
             }
         }
+    }
+
+    private void processClear(Message message) {
+        team = new Team();
+        CLEAR_TIMESTAMP = 0L;
+        CLEAR_CODE = StringUtils.EMPTY;
+        sendMessage(message, getFrom(message) + " сбросил состав");
+    }
+
+    private boolean isClearCode(Message message) {
+        long current = System.currentTimeMillis();
+        return CLEAR_CODE.equals(message.getText()) && (CLEAR_TIMESTAMP < current && current < CLEAR_TIMESTAMP + 60_000);
+    }
+
+    private String generateCode() {
+        StrBuilder builder = new StrBuilder();
+        Random random = new Random();
+        for (int i = 0; i < Constants.CODE_LENGTH; i++) {
+            builder.append(random.nextInt(10));
+        }
+        return builder.toString();
     }
 
     private boolean processFriends(Message message) {
@@ -118,7 +154,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "'?' - Под вопросом" + System.lineSeparator() +
                 "'+n' - Плюсуешь n друзей (1-9)" + System.lineSeparator() +
                 "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator() +
-                "'Состав' - Узнать состав на ближайшую среду";
+                "'Состав' - Узнать состав на ближайшую среду" + System.lineSeparator() +
+                "'Сброс' - Принудительный сброс состава";
     }
 
     private String getFrom(Message message) {
