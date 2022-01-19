@@ -156,4 +156,8 @@ public class Team {
             return player + " сделал -" + number + ". Итого: " + getTotal();
         }
     }
+
+    public HashMap<String, PlayerData> getTeam() {
+        return team;
+    }
 }

@@ -5,6 +5,14 @@ public class PlayerData {
     private Status status = Status.NOT_READY;
     private int calledPlayers;
 
+    public PlayerData(Status status, int calledPlayers) {
+        this.status = status;
+        this.calledPlayers = calledPlayers;
+    }
+
+    public PlayerData() {
+    }
+
     public Status getStatus() {
         return status;
     }
