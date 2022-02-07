@@ -1,0 +1,6 @@
+domain:
+  bot:
+    name: "BOT_NAME"
+    token: "BOT_TOKEN"
+  chat:
+    name: "CHAT_NAME"
