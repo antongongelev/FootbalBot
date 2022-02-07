@@ -27,7 +27,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${domain.bot.token}")
     private String BOT_TOKEN;
 
-    @Value("${domain.bot.token}")
+    @Value("${domain.bot.name}")
     private String BOT_NAME;
 
     private static String CLEAR_CODE = StringUtils.EMPTY;
@@ -41,12 +41,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(this);
+        } catch (TelegramApiException e) {
+            throw new BeanInitializationException("Cannot register TelegramBot", e);
+        } finally {
             System.out.println("Bot has been launched with params:");
             System.out.println("CHAT_NAME: " + CHAT_NAME);
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
-        } catch (TelegramApiException e) {
-            throw new BeanInitializationException("Cannot register TelegramBot", e);
         }
     }
 
