@@ -1,4 +1,4 @@
-package ru.telegrambot;
+package ru.telegrambot.domain;
 
 public enum Status {
 

@@ -1,7 +1,11 @@
-package ru.telegrambot;
+package ru.telegrambot.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,38 +15,43 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import javax.annotation.PostConstruct;
 import java.util.Random;
 
+@Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    private static String CHAT_NAME = StringUtils.EMPTY;
-    private static String BOT_TOKEN = StringUtils.EMPTY;
-    private static String BOT_NAME = StringUtils.EMPTY;
+    @Value("${domain.chat.name}")
+    private String CHAT_NAME;
+
+    @Value("${domain.bot.token}")
+    private String BOT_TOKEN;
+
+    @Value("${domain.bot.name}")
+    private String BOT_NAME;
+
     private static String CLEAR_CODE = StringUtils.EMPTY;
+
     private static long CLEAR_TIMESTAMP = 0L;
 
     private Team team = new Team();
 
-    public static void main(String[] args) {
-        try {
-            CHAT_NAME = args[0];
-            BOT_NAME = args[1];
-            BOT_TOKEN = args[2];
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @PostConstruct
+    public void initialize() {
         try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
-            api.registerBot(new TelegramBot());
-            System.out.println("Bot has been launched with params:");
-            System.out.println("CHAT_NAME: " + getChatName());
-            System.out.println("BOT_NAME: " + getBotName());
-            System.out.println("TOKEN: " + getToken());
+            api.registerBot(this);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            throw new BeanInitializationException("Cannot register TelegramBot", e);
+        } finally {
+            System.out.println("Bot has been launched with params:");
+            System.out.println("CHAT_NAME: " + CHAT_NAME);
+            System.out.println("BOT_NAME: " + BOT_NAME);
+            System.out.println("TOKEN: " + BOT_TOKEN);
         }
     }
 
+    @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
@@ -142,7 +151,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void validateChat(Message message) {
         String type = message.getChat().getType();
         String title = message.getChat().getTitle();
-        if (!("group".equals(type) || "supergroup".equals(type)) || !getChatName().contains(title)) {
+        if (!("group".equals(type) || "supergroup".equals(type)) || !CHAT_NAME.contains(title)) {
             throw new TeamException("Этот бот не предназначен для данного чата");
         }
     }
@@ -193,32 +202,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    @Override
     public String getBotUsername() {
-        return getBotName();
-    }
-
-    public String getBotToken() {
-        return getToken();
-    }
-
-    private static String getBotName() {
-        if (StringUtils.isEmpty(BOT_NAME)) {
-            return Constants.BOT_NAME;
-        }
         return BOT_NAME;
     }
 
-    private static String getChatName() {
-        if (StringUtils.isEmpty(CHAT_NAME)) {
-            return Constants.CHAT_NAME;
-        }
-        return CHAT_NAME;
-    }
-
-    private static String getToken() {
-        if (StringUtils.isEmpty(BOT_TOKEN)) {
-            return Constants.BOT_TOKEN;
-        }
+    @Override
+    public String getBotToken() {
         return BOT_TOKEN;
     }
 }

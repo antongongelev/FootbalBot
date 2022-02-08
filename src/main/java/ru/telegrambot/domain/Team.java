@@ -1,4 +1,4 @@
-package ru.telegrambot;
+package ru.telegrambot.domain;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,13 +1,10 @@
-package ru.telegrambot;
+package ru.telegrambot.domain;
 
 import java.time.DayOfWeek;
 import java.util.regex.Pattern;
 
 public interface Constants {
 
-    String CHAT_NAME = "CHAT_NAME";
-    String BOT_NAME = "BOT_NAME";
-    String BOT_TOKEN = "BOT_TOKEN";
     String TEAM = "СОСТАВ";
     String HELP = "/HELP";
     String CLEAR = "СБРОС";
