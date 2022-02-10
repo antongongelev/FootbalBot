@@ -2,7 +2,6 @@ package ru.telegrambot.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,10 +40,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(this);
+            System.out.println("Bot has been launched");
         } catch (TelegramApiException e) {
             throw new BeanInitializationException("Cannot register TelegramBot", e);
         } finally {
-            System.out.println("Bot has been launched with params:");
+            System.out.println("Bot params:");
             System.out.println("CHAT_NAME: " + CHAT_NAME);
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
