@@ -9,9 +9,10 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=football_bot
+      - POSTGRES_USER=bot
+      - POSTGRES_PASSWORD=9b9MGS2SwNwhuTH3
+      - PGPASSWORD=9b9MGS2SwNwhuTH3
     logging:
       driver: none
 

@@ -4,3 +4,11 @@ domain:
     token: "BOT_TOKEN"
   chat:
     name: "CHAT_NAME"
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/football_bot
+    username: bot
+    password: 9b9MGS2SwNwhuTH3
+    pool-size: 5
+  liquibase:
+    changeLogFile: src/main/resources/db/changelog/db.changelog-master.xml

@@ -19,3 +19,6 @@ production:
 		-Xss512k \
 		-Dspring.profiles.active=production \
 		-jar target/FootballBot-1.0-SNAPSHOT.jar
+
+psql:
+	docker exec -ti footbalbot_postgres psql --username=bot --dbname=football_bot
