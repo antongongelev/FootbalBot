@@ -3,7 +3,7 @@ development:
 		--project-directory=${PWD} \
 		--project-name=footballbot \
 		-f deploy/docker-compose.development.yml \
-		up
+		up -d
 
 stop-development:
 	docker-compose \
@@ -14,6 +14,7 @@ stop-development:
 
 production:
 	mvn clean package spring-boot:repackage
+	mvn liquibase:update -Dliquibase.propertyFile=application.yml -Dliquibase.propertyFileWillOverride=application.production.yml
 	java \
 		-Xmx330m \
 		-Xss512k \
