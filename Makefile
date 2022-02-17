@@ -19,7 +19,8 @@ production:
 		-Xmx330m \
 		-Xss512k \
 		-Dspring.profiles.active=production \
-		-jar target/FootballBot-1.0-SNAPSHOT.jar
+		-Xdebug -Xrunjdwp:transport=dt_socket,address=8786,server=y,suspend=n \
+		-jar target/FootballBot-1.0-SNAPSHOT.jar & disown
 
 psql:
 	docker exec -ti footbalbot_postgres psql --username=bot --dbname=football_bot

@@ -40,14 +40,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(this);
-            System.out.println("Bot has been launched");
-        } catch (TelegramApiException e) {
-            throw new BeanInitializationException("Cannot register TelegramBot", e);
-        } finally {
-            System.out.println("Bot params:");
+            System.out.println("Bot has been launched with params:");
             System.out.println("CHAT_NAME: " + CHAT_NAME);
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
+        } catch (TelegramApiException e) {
+            throw new BeanInitializationException("Cannot register TelegramBot: ", e);
         }
     }
 
