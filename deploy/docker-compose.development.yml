@@ -1,0 +1,20 @@
+version: '3.6'
+
+services:
+  postgres:
+    image: postgres:11.11-alpine
+    container_name: footballbot_postgres
+    volumes:
+      - pgsdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=football_bot
+      - POSTGRES_USER=bot
+      - POSTGRES_PASSWORD=9b9MGS2SwNwhuTH3
+      - PGPASSWORD=9b9MGS2SwNwhuTH3
+    logging:
+      driver: none
+
+volumes:
+  pgsdata:
