@@ -2,7 +2,7 @@ package ru.telegrambot.domain;
 
 public class PlayerData {
 
-    private Status status = Status.NOT_READY;
+    private Status status;
     private int calledPlayers;
 
     public PlayerData(Status status, int calledPlayers) {
@@ -10,7 +10,8 @@ public class PlayerData {
         this.calledPlayers = calledPlayers;
     }
 
-    public PlayerData() {
+    public PlayerData(Status status) {
+        this.status = status;
     }
 
     public Status getStatus() {

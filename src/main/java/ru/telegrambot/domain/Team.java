@@ -84,8 +84,7 @@ public class Team {
     public String addSelf(String player) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
-            PlayerData data = new PlayerData();
-            data.setStatus(Status.READY);
+            PlayerData data = new PlayerData(Status.READY);
             team.put(player, data);
             return player + " вписался. Итого: " + getTotal();
         } else {
@@ -94,6 +93,9 @@ public class Team {
                 return player + " попытался вписаться, хотя уже был вписан";
             }
             playerData.setStatus(Status.READY);
+            if (Status.CALLED_FRIENDS == status) {
+                return player + " вписался. Итого: " + getTotal();
+            }
             return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.READY.getStatus() + "'. Итого: " + getTotal();
         }
     }
@@ -101,8 +103,7 @@ public class Team {
     public String doNotKnow(String player) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
-            PlayerData data = new PlayerData();
-            data.setStatus(Status.DOES_NOT_KNOW);
+            PlayerData data = new PlayerData(Status.DOES_NOT_KNOW);
             team.put(player, data);
             return player + " под вопросом. Итого: " + getTotal();
         } else {
@@ -111,6 +112,9 @@ public class Team {
                 return player + " усомнился что придет, хотя и так не был уверен";
             }
             playerData.setStatus(Status.DOES_NOT_KNOW);
+            if (Status.CALLED_FRIENDS == status) {
+                return player + " под вопросом. Итого: " + getTotal();
+            }
             return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.DOES_NOT_KNOW.getStatus() + "'. Итого: " + getTotal();
         }
     }
@@ -118,8 +122,7 @@ public class Team {
     public String removeMe(String player) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
-            PlayerData data = new PlayerData();
-            data.setStatus(Status.NOT_READY);
+            PlayerData data = new PlayerData(Status.NOT_READY);
             team.put(player, data);
             return player + " слился. Итого: " + getTotal();
         } else {
@@ -128,6 +131,9 @@ public class Team {
                 return player + " попытался слиться, хотя и не собирался приходить";
             }
             playerData.setStatus(Status.NOT_READY);
+            if (Status.CALLED_FRIENDS == status) {
+                return player + " слился. Итого: " + getTotal();
+            }
             return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.NOT_READY.getStatus() + "'. Итого: " + getTotal();
         }
     }
@@ -135,7 +141,7 @@ public class Team {
     public String addFriends(String player, int number) {
         PlayerData playerData = team.get(player);
         if (playerData == null) {
-            PlayerData data = new PlayerData();
+            PlayerData data = new PlayerData(Status.CALLED_FRIENDS);
             data.setCalledPlayers(data.getCalledPlayers() + number);
             team.put(player, data);
         } else {
