@@ -1,8 +1,10 @@
 package ru.telegrambot.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import ru.telegrambot.data.TeamService;
 
 import javax.annotation.PostConstruct;
 import java.util.Random;
@@ -35,6 +38,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private Team team = new Team();
 
+    @Autowired
+    private TeamService teamService;
+
     @PostConstruct
     public void initialize() {
         try {
@@ -52,64 +58,67 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        if (message != null && message.hasText()) {
-            try {
-                validateChat(message);
-            } catch (TeamException e) {
-                sendMessage(message, e.getLocalizedMessage());
+        if (message == null || !message.hasText()) {
+            return;
+        }
+        try {
+            validateChat(message);
+        } catch (TeamException e) {
+            sendMessage(message, e.getLocalizedMessage());
+            return;
+        }
+        try {
+            team.validateDay();
+        } catch (TeamException e) {
+            sendMessage(message, e.getLocalizedMessage());
+        }
+        try {
+            team = teamService.load();
+            if (isClearCode(message)) {
+                processClear(message);
                 return;
             }
-            try {
-                team.validateDay();
-            } catch (TeamException e) {
-                team = new Team();
-                sendMessage(message, e.getLocalizedMessage());
+            if (processFriends(message)) {
+                return;
             }
-            try {
-                if (isClearCode(message)) {
-                    processClear(message);
-                    return;
-                }
-                if (processFriends(message)) {
-                    return;
-                }
-                switch (message.getText().replaceAll(" ", "").toUpperCase()) {
-                    case Constants.TEAM:
-                        String teamReport = team.getTeamReport();
-                        sendMessage(message, teamReport);
-                        break;
-                    case Constants.ADD_ME:
-                        String addSelf = team.addSelf(getFrom(message));
-                        sendMessage(message, addSelf);
-                        break;
-                    case Constants.DO_NOT_KNOW:
-                        String doNotKnow = team.doNotKnow(getFrom(message));
-                        sendMessage(message, doNotKnow);
-                        break;
-                    case Constants.REMOVE_ME:
-                        String removeMe = team.removeMe(getFrom(message));
-                        sendMessage(message, removeMe);
-                        break;
-                    case Constants.HELP:
-                        String help = getHelp();
-                        sendMessage(message, help);
-                        break;
-                    case Constants.CLEAR:
-                        CLEAR_CODE = generateCode();
-                        CLEAR_TIMESTAMP = System.currentTimeMillis();
-                        sendMessage(message, "Для сброса состава отправьте код '" + CLEAR_CODE + "' в течение минуты");
-                        break;
-                    default:
-                        break;
-                }
-            } catch (TeamException e) {
-                sendMessage(message, e.getLocalizedMessage());
+            switch (message.getText().replaceAll(" ", "").toUpperCase()) {
+                case Constants.TEAM:
+                    String teamReport = team.getTeamReport();
+                    sendMessage(message, teamReport);
+                    break;
+                case Constants.ADD_ME:
+                    String addSelf = team.addSelf(getFrom(message));
+                    sendMessage(message, addSelf);
+                    break;
+                case Constants.DO_NOT_KNOW:
+                    String doNotKnow = team.doNotKnow(getFrom(message));
+                    sendMessage(message, doNotKnow);
+                    break;
+                case Constants.REMOVE_ME:
+                    String removeMe = team.removeMe(getFrom(message));
+                    sendMessage(message, removeMe);
+                    break;
+                case Constants.HELP:
+                    String help = getHelp();
+                    sendMessage(message, help);
+                    break;
+                case Constants.CLEAR:
+                    CLEAR_CODE = generateCode();
+                    CLEAR_TIMESTAMP = System.currentTimeMillis();
+                    sendMessage(message, "Для сброса состава отправьте код '" + CLEAR_CODE + "' в течение минуты");
+                    break;
+                default:
+                    break;
             }
+            teamService.save(team);
+        } catch (TeamException | JsonProcessingException e) {
+            sendMessage(message, e.getLocalizedMessage());
         }
     }
 
-    private void processClear(Message message) {
+    private void processClear(Message message) throws JsonProcessingException {
         team = new Team();
+        teamService.save(team);
         CLEAR_TIMESTAMP = 0L;
         CLEAR_CODE = StringUtils.EMPTY;
         sendMessage(message, getFrom(message) + " сбросил состав");
@@ -129,17 +138,19 @@ public class TelegramBot extends TelegramLongPollingBot {
         return builder.toString();
     }
 
-    private boolean processFriends(Message message) {
+    private boolean processFriends(Message message) throws JsonProcessingException {
         String formattedText = message.getText().replaceAll(" ", "").toUpperCase();
         if (Constants.PLUS_PATTERN.matcher(formattedText).matches()) {
             int number = Integer.parseInt(formattedText.substring(1));
             String addFriends = team.addFriends(getFrom(message), number);
+            teamService.save(team);
             sendMessage(message, addFriends);
             return true;
         }
         if (Constants.MINUS_PATTERN.matcher(formattedText).matches()) {
             int number = Integer.parseInt(formattedText.substring(1));
             String removeFriends = team.removeFriends(getFrom(message), number);
+            teamService.save(team);
             sendMessage(message, removeFriends);
             return true;
         }

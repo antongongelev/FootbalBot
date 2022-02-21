@@ -1,5 +1,8 @@
 package ru.telegrambot.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
@@ -11,7 +14,18 @@ import java.util.Locale;
 public class Team {
 
     private final String wednesday = getNearest();
-    private final HashMap<String, PlayerData> team = new HashMap<>();
+    private HashMap<String, PlayerData> team = new HashMap<>();
+    private ObjectMapper mapper = new ObjectMapper();
+
+    public Team() {
+
+    }
+
+    public Team(String jsonInput) throws JsonProcessingException {
+        TypeReference<HashMap<String, PlayerData>> typeRef
+                = new TypeReference<HashMap<String, PlayerData>>() {};
+        team = mapper.readValue(jsonInput, typeRef);
+    }
 
     private String getNearest() {
         LocalDate localDate = LocalDate.now();
@@ -165,5 +179,10 @@ public class Team {
 
     public HashMap<String, PlayerData> getTeam() {
         return team;
+    }
+
+    public String serialize() throws JsonProcessingException {
+        return mapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(team);
     }
 }
