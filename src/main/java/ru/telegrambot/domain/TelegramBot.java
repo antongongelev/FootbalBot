@@ -70,6 +70,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             team.validateDay();
         } catch (TeamException e) {
+            team = new Team();
+            try {
+                teamService.save(team);
+            } catch (JsonProcessingException ex) {
+                ex.printStackTrace();
+            }
             sendMessage(message, e.getLocalizedMessage());
         }
         try {
