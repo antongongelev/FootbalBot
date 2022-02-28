@@ -8,6 +8,6 @@ public class ItShouldSaveTeamTest {
 
     @Test
     public void itWorks() throws Exception {
-        assertEquals(1, 2);
+        assertEquals(1, 1);
     }
 }

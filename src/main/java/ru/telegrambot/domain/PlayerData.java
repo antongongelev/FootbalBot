@@ -10,6 +10,8 @@ public class PlayerData {
         this.calledPlayers = calledPlayers;
     }
 
+    public PlayerData(){}
+
     public PlayerData(Status status) {
         this.status = status;
     }

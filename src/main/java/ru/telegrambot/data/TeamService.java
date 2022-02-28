@@ -23,6 +23,9 @@ public class TeamService {
 
     public Team load() throws JsonProcessingException {
         Iterable<TeamEntity> all = database.findAll();
+        if (!all.iterator().hasNext()) {
+            return new Team();
+        }
         TeamEntity firstAndLast = all.iterator().next();
         return new Team(firstAndLast.value);
     }
