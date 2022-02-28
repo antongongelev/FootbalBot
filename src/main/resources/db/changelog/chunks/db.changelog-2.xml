@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet id="1627661911" author="Anton Gongelev">
+        <createTable tableName="team">
+            <column name="id" type="integer" autoIncrement="true"/>
+            <column name="value" type="varchar2(255)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
