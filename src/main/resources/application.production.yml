@@ -4,3 +4,11 @@ domain:
     token: ${BOT_TOKEN}
   chat:
     name: ${CHAT_NAME}
+spring:
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+    pool-size: 5
+  liquibase:
+    changeLogFile: src/main/resources/db/changelog/db.changelog-master.xml
