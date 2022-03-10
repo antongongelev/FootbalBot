@@ -1,9 +1,8 @@
 #!/bin/sh
 
-x=$tempvar
-y=${x#*://}
-z=${y#*:}
+WITHOUT_SCHEMA=${DATABASE_URL#*://}
+WITHOUT_USERNAME=${WITHOUT_SCHEMA#*:}
 
-export JDBC_DATABASE_URL=jdbc:postgresql://${x#*@}
-export JDBC_DATABASE_USERNAME=${y%%:*}
-export JDBC_DATABASE_PASSWORD=${z%%@*}
+export JDBC_DATABASE_URL=jdbc:postgresql://${DATABASE_URL#*@}
+export JDBC_DATABASE_USERNAME=${WITHOUT_SCHEMA%%:*}
+export JDBC_DATABASE_PASSWORD=${WITHOUT_USERNAME%%@*}
