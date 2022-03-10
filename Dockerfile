@@ -2,15 +2,8 @@ FROM maven:3.8.4-openjdk-8-slim AS build-env
 COPY . /football_bot
 WORKDIR /football_bot
 RUN mvn clean package spring-boot:repackage
+RUN source ./scripts/define-heroku-variables.sh
 
-ARG JDBC_DATABASE_URL=?
-ENV JDBC_DATABASE_URL=$JDBC_DATABASE_URL
-
-ARG JDBC_DATABASE_USERNAME=?
-ENV JDBC_DATABASE_USERNAME=$JDBC_DATABASE_USERNAME
-
-ARG JDBC_DATABASE_PASSWORD=?
-ENV JDBC_DATABASE_PASSWORD=$JDBC_DATABASE_PASSWORD
 
 RUN printenv
 
