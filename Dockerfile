@@ -10,14 +10,7 @@ WORKDIR /bot
 COPY --from=build-env /football_bot/target/FootballBot-1.0-SNAPSHOT.jar .
 # Run under non-privileged user with minimal write permissions
 USER user
-ENTRYPOINT [
-    "java",
-    "-Xmx330m",
-    "-Xss512k",
-    "-Dspring.profiles.active=production",
-    "-jar",
-    "FootballBot-1.0-SNAPSHOT.jar"
-]
+ENTRYPOINT ["java", "-Xmx330m", "-Xss512k", "-Dspring.profiles.active=production", "-jar", "FootballBot-1.0-SNAPSHOT.jar"]
 # Expose dummy port to avoid Heroku errors
 ENV PORT=8080
 EXPOSE $PORT
