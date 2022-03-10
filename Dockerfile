@@ -2,6 +2,10 @@ FROM maven:3.8.4-openjdk-8-slim AS build-env
 COPY . /football_bot
 WORKDIR /football_bot
 SHELL ["/bin/bash", "-c"]
+
+ARG DATABASE_URL=?
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN source ./scripts/define-heroku-variables.sh
 
 RUN printenv
