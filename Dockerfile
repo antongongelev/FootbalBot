@@ -2,6 +2,7 @@ FROM maven:3.8.4-openjdk-8-slim AS build-env
 COPY . /football_bot
 WORKDIR /football_bot
 RUN mvn clean package spring-boot:repackage
+RUN printenv
 RUN mvn liquibase:update -Dliquibase.propertyFile=application.production.yml -Dliquibase.propertyFileWillOverride=true
 
 FROM bellsoft/liberica-openjdk-alpine:8u322 as final
