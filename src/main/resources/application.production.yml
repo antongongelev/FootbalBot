@@ -11,4 +11,4 @@ spring:
     password: ${JDBC_DATABASE_PASSWORD}
     pool-size: 5
   liquibase:
-    changelogfile: src/main/resources/db/changelog/db.changelog-master.xml
+    change-log: src/main/resources/db/changelog/db.changelog-master.xml
