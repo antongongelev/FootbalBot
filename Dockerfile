@@ -11,8 +11,7 @@ COPY --from=build-env /football_bot/scripts/define-heroku-variables.sh .
 COPY --from=build-env /football_bot/scripts/entrypoint.sh .
 # Run under non-privileged user with minimal write permissions
 USER user
-ENTRYPOINT ls -la
-# ENTRYPOINT [entrypoint.sh]
+CMD ["/bin/bash", "entrypoint.sh"]
 # Expose dummy port to avoid Heroku errors
 ENV PORT=8080
 EXPOSE $PORT
