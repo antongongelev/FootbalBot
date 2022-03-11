@@ -1,14 +1,14 @@
 domain:
   bot:
-    name: "BOT_NAME"
-    token: "BOT_TOKEN"
+    name: ${BOT_NAME}
+    token: ${BOT_TOKEN}
   chat:
-    name: "CHAT_NAME"
+    name: ${CHAT_NAME}
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/football_bot
-    username: bot
-    password: 9b9MGS2SwNwhuTH3
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
     pool-size: 5
   liquibase:
-    changeLogFile: src/main/resources/db/changelog/db.changelog-master.xml
+    change-log: src/main/resources/db/changelog/db.changelog-master.xml
