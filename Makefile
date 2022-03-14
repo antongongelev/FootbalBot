@@ -13,4 +13,5 @@ stop-development:
 		down
 
 psql:
-	docker exec -ti footbalbot_postgres psql --username=bot --dbname=football_bot
+	PGPASSWORD=dd1b42145cf89501f1f41c3220b91337e83c7514f3dbff53f3c78e3a536fc8ff \
+	psql --host=ec2-176-34-105-15.eu-west-1.compute.amazonaws.com --username=hnlrzebjiwpxjg --dbname=dbcofcaflth2he
