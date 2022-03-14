@@ -164,11 +164,12 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void validateChat(Message message) {
-        String type = message.getChat().getType();
-        String title = message.getChat().getTitle();
-        if (!("group".equals(type) || "supergroup".equals(type)) || !CHAT_NAME.contains(title)) {
-            throw new TeamException("Этот бот не предназначен для данного чата");
-        }
+        System.out.println("Chat id is " + message.getChatId());
+//        String type = message.getChat().getType();
+//        String title = message.getChat().getTitle();
+//        if (!("group".equals(type) || "supergroup".equals(type)) || !CHAT_NAME.contains(title)) {
+//            throw new TeamException("Этот бот не предназначен для данного чата");
+//        }
     }
 
     private String getHelp() {
