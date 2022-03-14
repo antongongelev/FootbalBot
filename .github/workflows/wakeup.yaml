@@ -1,13 +1,13 @@
-name: Wakeup
-
-on:
-  schedule:
-    - cron: '*/15 06-23 * * *' # At every 15th minute past every hour from 6 through 23
-
-jobs:
-  build-pages:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Heroku dyno is shutting down automatically. We should trigger it for waking up.
-        run: |
-          curl https://csi-team-bot.herokuapp.com
+#name: Wakeup
+#
+#on:
+#  schedule:
+#    - cron: '*/15 06-23 * * *' # At every 15th minute past every hour from 6 through 23
+#
+#jobs:
+#  build-pages:
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - name: Heroku dyno is shutting down automatically. We should trigger it for waking up.
+#        run: |
+#          curl https://csi-team-bot.herokuapp.com
