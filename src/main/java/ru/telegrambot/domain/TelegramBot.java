@@ -23,8 +23,8 @@ import java.util.Random;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    @Value("${domain.chat.name}")
-    private String CHAT_NAME;
+    @Value("${domain.chat.id}")
+    private String CHAT_ID;
 
     @Value("${domain.bot.token}")
     private String BOT_TOKEN;
@@ -47,7 +47,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(this);
             System.out.println("Bot has been launched with params:");
-            System.out.println("CHAT_NAME: " + CHAT_NAME);
+            System.out.println("CHAT_ID: " + CHAT_ID);
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
         } catch (TelegramApiException e) {
@@ -165,11 +165,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void validateChat(Message message) {
         System.out.println("Chat id is " + message.getChatId());
-//        String type = message.getChat().getType();
-//        String title = message.getChat().getTitle();
-//        if (!("group".equals(type) || "supergroup".equals(type)) || !CHAT_NAME.contains(title)) {
-//            throw new TeamException("Этот бот не предназначен для данного чата");
-//        }
+        long chatId = message.getChat().getId();
+        if (!Long.valueOf(CHAT_ID).equals(chatId)) {
+            throw new TeamException("Этот бот не предназначен для данного чата");
+        }
     }
 
     private String getHelp() {

@@ -3,7 +3,7 @@ domain:
     name: ${BOT_NAME}
     token: ${BOT_TOKEN}
   chat:
-    name: ${CHAT_NAME}
+    id: ${CHAT_ID}
 spring:
   datasource:
     url: ${JDBC_DATABASE_URL}
