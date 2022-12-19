@@ -32,6 +32,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${domain.bot.name}")
     private String BOT_NAME;
 
+    @Value("${domain.football.day}")
+    private String FOOTBALL_DAY;
+
     private static String CLEAR_CODE = StringUtils.EMPTY;
 
     private static long CLEAR_TIMESTAMP = 0L;
@@ -40,6 +43,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Autowired
     private TeamService teamService;
+
+    @Autowired
+    private DayService dayService;
 
     @PostConstruct
     public void initialize() {
@@ -50,6 +56,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             System.out.println("CHAT_NAME: " + CHAT_NAME);
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
+            System.out.println("FOOTBALL_DAY: " + FOOTBALL_DAY);
         } catch (TelegramApiException e) {
             throw new BeanInitializationException("Cannot register TelegramBot: ", e);
         }
@@ -68,7 +75,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             return;
         }
         try {
-            team.validateDay();
+            dayService.validateDay();
         } catch (TeamException e) {
             team = new Team();
             try {
@@ -77,6 +84,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 ex.printStackTrace();
             }
             sendMessage(message, e.getLocalizedMessage());
+        } catch (IllegalAccessException e) {
+            throw new TeamException(e.getMessage());
         }
         try {
             team = teamService.load();
@@ -89,7 +98,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
             switch (message.getText().replaceAll(" ", "").toUpperCase()) {
                 case Constants.TEAM:
-                    String teamReport = team.getTeamReport();
+                    String teamReport = team.getTeamReport(dayService.getDay());
                     sendMessage(message, teamReport);
                     break;
                 case Constants.ADD_ME:

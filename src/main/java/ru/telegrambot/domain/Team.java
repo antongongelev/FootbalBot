@@ -5,17 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class Team {
 
-    private final String wednesday = getNearest();
     private HashMap<String, PlayerData> team = new HashMap<>();
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public Team() {
 
@@ -23,25 +18,13 @@ public class Team {
 
     public Team(String jsonInput) throws JsonProcessingException {
         TypeReference<HashMap<String, PlayerData>> typeRef
-                = new TypeReference<HashMap<String, PlayerData>>() {};
+                = new TypeReference<HashMap<String, PlayerData>>() {
+        };
         team = mapper.readValue(jsonInput, typeRef);
     }
 
-    private String getNearest() {
-        LocalDate localDate = LocalDate.now();
-        LocalDate nearest = localDate.with(TemporalAdjusters.nextOrSame(Constants.DAY_OF_WEEK));
-        return nearest.format(DateTimeFormatter.ofPattern("dd MMMM", new Locale("ru")));
-    }
-
-    public void validateDay() {
-        String nearest = getNearest();
-        if (!wednesday.equals(nearest)) {
-            throw new TeamException("Состав на " + wednesday + " был сброшен. Набираем на " + nearest);
-        }
-    }
-
-    public String getTeamReport() {
-        return "Состав на " + wednesday + ": " + System.lineSeparator()
+    public String getTeamReport(String footballDay) {
+        return "Состав на " + footballDay + ": " + System.lineSeparator()
                 + Constants.DELIMITER + System.lineSeparator()
                 + getPlayers()
                 + Constants.DELIMITER + System.lineSeparator()
@@ -183,6 +166,6 @@ public class Team {
 
     public String serialize() throws JsonProcessingException {
         return mapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(team);
+                     .writeValueAsString(team);
     }
 }

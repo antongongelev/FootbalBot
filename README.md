@@ -1,5 +1,5 @@
 # FootbalBot
-Telegram bot for managing footbal team players number
+Telegram bot for managing football team players number
 
 #### Deploy:
 * Set the following environment variables:

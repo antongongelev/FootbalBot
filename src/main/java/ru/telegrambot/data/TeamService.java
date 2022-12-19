@@ -10,10 +10,6 @@ public class TeamService {
     @Autowired
     private TeamRepository database;
 
-    public TeamService(TeamRepository db) {
-        database = db;
-    }
-
     public void save(Team origin) throws JsonProcessingException {
         TeamEntity entity = new TeamEntity();
         entity.value = origin.serialize();
