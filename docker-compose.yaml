@@ -2,21 +2,22 @@ version: '3.3'
 
 services:
   app:
-    image: 'football_bot'
+    image: 'antongongelev/football_bot'
     ports:
       - "8787:8787"
     depends_on:
       - db
+    restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/football_bot_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-      #  Укажите желаемые настройки для бота ниже:
-      - DOMAIN_BOT_NAME='Имя бота'
-      - DOMAIN_BOT_TOKEN='Токен бота'
-      - DOMAIN_CHAT_NAME='Название чата в телеграмм'
-      - DOMAIN_FOOTBALL_DAY='День недели на русском'
+      #  Укажите желаемые настройки для бота ниже (нужны кавычки, если слов несколько):
+      - DOMAIN_BOT_NAME=Имя бота
+      - DOMAIN_BOT_TOKEN=Токен бота
+      - DOMAIN_CHAT_NAME=Название чата в телеграмм
+      - DOMAIN_FOOTBALL_DAY=День недели на русском
 
   db:
     image: 'postgres'
@@ -31,3 +32,4 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: always
