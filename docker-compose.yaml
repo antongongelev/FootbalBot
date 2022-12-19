@@ -12,11 +12,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-      #  PUT YOUR SETTINGS DOWN BELLOW
-      - DOMAIN_BOT_NAME=GongeliniBot
-      - DOMAIN_BOT_TOKEN=5095369262:AAH3X0MmvI0kMly9W83JqPeW28aqCdPiGGk
-      - DOMAIN_CHAT_NAME='testgroup bot'
-      - DOMAIN_FOOTBALL_DAY=Четверг
+      #  Укажите желаемые настройки для бота ниже:
+      - DOMAIN_BOT_NAME='Имя бота'
+      - DOMAIN_BOT_TOKEN='Токен бота'
+      - DOMAIN_CHAT_NAME='Название чата в телеграмм'
+      - DOMAIN_FOOTBALL_DAY='День недели на русском'
 
   db:
     image: 'postgres'

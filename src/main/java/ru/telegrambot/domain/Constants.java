@@ -11,7 +11,6 @@ public interface Constants {
     String ADD_ME = "+";
     String REMOVE_ME = "-";
     String DO_NOT_KNOW = "?";
-    DayOfWeek DAY_OF_WEEK = DayOfWeek.WEDNESDAY;
     Pattern MINUS_PATTERN = Pattern.compile("[-][1-9]");
     Pattern PLUS_PATTERN = Pattern.compile("[+][1-9]");
     String DELIMITER = "======================";

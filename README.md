@@ -1,12 +1,16 @@
 # FootbalBot
+
 Telegram bot for managing football team players number
 
 #### Deploy:
-* Set the following environment variables:
-  * DOMAIN_CHAT_NAME=1
-  * DOMAIN_BOT_NAME=2
-  * DOMAIN_BOT_TOKEN=3
+
+* Set the following environment variables in Docker-compose.yaml:
+    * DOMAIN_CHAT_NAME=Your telegram chat name (use '' if it contains several words)
+    * DOMAIN_BOT_NAME=Your bot name
+    * DOMAIN_BOT_TOKEN=Your bot token
+    * DOMAIN_FOOTBALL_DAY=Day of Week (in Russian)
 * Run the following command
+
 ```bash
-make production
+docker-compose up -d
 ```
