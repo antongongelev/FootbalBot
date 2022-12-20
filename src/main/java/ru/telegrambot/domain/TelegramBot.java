@@ -187,8 +187,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "'?' - Под вопросом" + System.lineSeparator() +
                 "'+n' - Плюсуешь n друзей (1-9)" + System.lineSeparator() +
                 "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator() +
-                "'Состав' - Узнать состав на ближайшую среду" + System.lineSeparator() +
-                "'Сброс' - Принудительный сброс состава";
+                "'Состав' - Узнать состав" + System.lineSeparator() +
+                "'Сброс' - Сброс состава";
     }
 
     private String getFrom(Message message) {
