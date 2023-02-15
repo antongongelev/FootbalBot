@@ -1,7 +1,6 @@
 production:
 	make stop || true
 	mvn clean package spring-boot:repackage
-	mvn liquibase:update -Dliquibase.propertyFile=application.yml
 	java \
 		-Xmx330m \
 		-Xss512k \
@@ -11,4 +10,3 @@ production:
 
 stop:
 	kill -9 $$(ps aux | grep FootballBot | grep -v grep | awk '{print $$2}')
-

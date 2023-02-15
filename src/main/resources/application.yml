@@ -1,15 +1,20 @@
 domain:
   bot:
-    name: GongeliniTestBot
-    token: 5095369262:AAH3X0MmvI0kMly9W83JqPeW28aqCdPiGGk
+    name: CSITeamBot
+    token: 5007880884:AAGwLulWFc-OIbHRD0pnHa57Wqb_sgG01Qo
+#    name: AntonTestFootballBot
+#    token: 5095369262:AAF0kOtR8gxfKxZ0fKpUmd98-idk11GXaxk
   chat:
-    name: NewGroup
+    name: 'Футбол по средам'
+#    name: NewGroup
   football:
-    day: Вторник_19:30;Пятница_04:00
+    day: Среда_21:00
+#    day: Вторник_19:30;Пятница_04:00
     check-in-before-hours: 48
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/football_bot_db
+#    url: jdbc:postgresql://localhost:5432/test_football
     username: postgres
     password: postgres
   liquibase:
