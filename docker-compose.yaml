@@ -14,11 +14,11 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       #  Укажите желаемые настройки для бота ниже (нужны кавычки, если слов несколько):
-      - DOMAIN_BOT_NAME=Имя бота
-      - DOMAIN_BOT_TOKEN=Токен бота
-      - DOMAIN_CHAT_NAME=Название чата в телеграмм
-      - DOMAIN_FOOTBALL_DAY=День недели на русском
-      - DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=Время до футбола, с которого возможна запись
+      - DOMAIN_BOT_NAME=Имя бота (TestBot)
+      - DOMAIN_BOT_TOKEN=Токен бота (5095369262:AAE3X0MmvI0kGly9W83JqPeW28aqCdPiGGk)
+      - DOMAIN_CHAT_NAME=Название чата в телеграмм (NewGroup)
+      - DOMAIN_FOOTBALL_DAY=Дни недели и время (Вторник_19:30;Пятница_04:00)
+      - DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=Время до футбола, с которого возможна запись (48)
 
   db:
     image: 'postgres'
