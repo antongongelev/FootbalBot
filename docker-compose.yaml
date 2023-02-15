@@ -18,6 +18,7 @@ services:
       - DOMAIN_BOT_TOKEN=Токен бота
       - DOMAIN_CHAT_NAME=Название чата в телеграмм
       - DOMAIN_FOOTBALL_DAY=День недели на русском
+      - DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=Время до футбола, с которого возможна запись
 
   db:
     image: 'postgres'

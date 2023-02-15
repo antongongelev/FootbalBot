@@ -9,6 +9,7 @@ Telegram bot for managing football team players number
     * DOMAIN_BOT_NAME=Your bot name
     * DOMAIN_BOT_TOKEN=Your bot token
     * DOMAIN_FOOTBALL_DAY=Day of Week (in Russian)
+    * DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=Time before event to enroll (in hours)
 * Run the following command
 
 ```bash
