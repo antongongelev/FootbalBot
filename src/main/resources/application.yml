@@ -6,7 +6,7 @@ domain:
     name: NewGroup
   football:
     day: Вторник_19:30;Пятница_04:00
-    check-in-before-hours: 45
+    check-in-before-hours: 48
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/football_bot_db

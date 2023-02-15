@@ -6,6 +6,7 @@ import org.apache.commons.lang3.text.StrBuilder;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -72,37 +73,37 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new BeanInitializationException("Cannot register TelegramBot: ", e);
         }
+    }
 
-        ScheduledExecutorService taskService = Executors.newScheduledThreadPool(1);
-        taskService.scheduleAtFixedRate(() -> {
-            if (Objects.isNull(chatID)) {
-                return;
-            }
+    @Scheduled(fixedDelay = 300_000)
+    public void task() {
+        if (Objects.isNull(chatID)) {
+            return;
+        }
 
+        try {
+            dayService.validateDay();
+        } catch (TeamException e) {
+            team = new Team();
+            isReadyToSet = false;
             try {
-                dayService.validateDay();
-            } catch (TeamException e) {
-                team = new Team();
-                isReadyToSet = false;
-                try {
-                    teamService.save(team);
-                } catch (JsonProcessingException ex) {
-                    ex.printStackTrace();
-                }
-                sendMessage(e.getLocalizedMessage());
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                teamService.save(team);
+            } catch (JsonProcessingException ex) {
+                ex.printStackTrace();
             }
+            sendMessage(e.getLocalizedMessage());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
-            try {
-                if (!isReadyToSet && dayService.isFootballSoon()) {
-                    isReadyToSet = true;
-                    sendMessage("Набираем состав на " + dayService.getDay());
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+        try {
+            if (!isReadyToSet && dayService.isFootballSoon()) {
+                isReadyToSet = true;
+                sendMessage("Набираем состав на " + dayService.getDay());
             }
-        }, 0, 60, TimeUnit.MINUTES);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
