@@ -1,9 +1,12 @@
 domain:
   bot:
-    name:
-    token:
+    name: GongeliniTestBot
+    token: 5095369262:AAH3X0MmvI0kMly9W83JqPeW28aqCdPiGGk
   chat:
-    name:
+    name: NewGroup
+  football:
+    day: Вторник_19:30;Пятница_04:00
+    check-in-before-hours: 45
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/football_bot_db
@@ -12,3 +15,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
