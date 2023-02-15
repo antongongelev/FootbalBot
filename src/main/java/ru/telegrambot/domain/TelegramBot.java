@@ -138,6 +138,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                         return;
                     }
                     String addSelf = team.addSelf(getFrom(message));
+                    teamService.save(team);
                     sendMessage(message, addSelf);
                     break;
                 case Constants.DO_NOT_KNOW:
@@ -145,6 +146,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                         return;
                     }
                     String doNotKnow = team.doNotKnow(getFrom(message));
+                    teamService.save(team);
                     sendMessage(message, doNotKnow);
                     break;
                 case Constants.REMOVE_ME:
@@ -152,6 +154,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                         return;
                     }
                     String removeMe = team.removeMe(getFrom(message));
+                    teamService.save(team);
                     sendMessage(message, removeMe);
                     break;
                 case Constants.HELP:
@@ -169,7 +172,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 default:
                     break;
             }
-            teamService.save(team);
         } catch (TeamException | JsonProcessingException e) {
             sendMessage(message, e.getLocalizedMessage());
         }

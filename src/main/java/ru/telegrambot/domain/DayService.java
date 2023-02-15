@@ -30,10 +30,11 @@ public class DayService {
     }
 
     public void validateDay() throws IllegalAccessException {
+        String oldDay = footballDay;
         String nearest = getNearest();
         if (!footballDay.equals(nearest)) {
             footballDay = getNearest();
-            throw new TeamException("Следующий футбол будет " + nearest);
+            throw new TeamException("Состав на " + oldDay + " был сброшен. Следующий футбол будет " + nearest);
         }
     }
 
