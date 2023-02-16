@@ -1,20 +1,28 @@
 domain:
   bot:
+#     name: FOOTBALL_TEST_ANTON_BOT
+#     token: 6124382389:AAHMcl8ERUekcKYy2nye6j7elTBXyJYcNH4
+
     name: CSITeamBot
     token: 5007880884:AAGwLulWFc-OIbHRD0pnHa57Wqb_sgG01Qo
+
 #    name: AntonTestFootballBot
 #    token: 5095369262:AAF0kOtR8gxfKxZ0fKpUmd98-idk11GXaxk
   chat:
-    name: 'Футбол по средам'
-#    name: NewGroup
+#          my test
+#     id: -832578892
+
+#           csi
+    id: -1142763396
+
+#       nogom9ch
+#    id: -1618609142
   football:
     day: Среда_21:00
-#    day: Вторник_19:30;Пятница_04:00
-    check-in-before-hours: 48
+    check-in-before-hours: 56
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/football_bot_db
-#    url: jdbc:postgresql://localhost:5432/test_football
     username: postgres
     password: postgres
   liquibase:

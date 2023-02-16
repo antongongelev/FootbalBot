@@ -19,17 +19,13 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.telegrambot.data.TeamService;
 
 import javax.annotation.PostConstruct;
-import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    @Value("${domain.chat.name}")
-    private String CHAT_NAME;
+    @Value("${domain.chat.id}")
+    private String CHAT_ID;
 
     @Value("${domain.bot.token}")
     private String BOT_TOKEN;
@@ -42,8 +38,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Value("${domain.football.check-in-before-hours}")
     private String CHECK_IN_BEFORE;
-
-    private Long chatID;
 
     private boolean isReadyToSet;
 
@@ -65,7 +59,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
             api.registerBot(this);
             System.out.println("Bot has been launched with params:");
-            System.out.println("CHAT_NAME: " + CHAT_NAME);
+            System.out.println("CHAT_ID: " + CHAT_ID);
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
             System.out.println("FOOTBALL_DAY: " + FOOTBALL_DAY);
@@ -77,9 +71,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Scheduled(fixedDelay = 300_000)
     public void task() {
-        if (Objects.isNull(chatID)) {
-            return;
-        }
 
         try {
             dayService.validateDay();
@@ -99,9 +90,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             if (!isReadyToSet && dayService.isFootballSoon()) {
                 isReadyToSet = true;
-                sendMessage("Набираем состав на " + dayService.getDay());
+
+                Team loadedTeam = teamService.load();
+                if (loadedTeam.getTeam().isEmpty()) {
+                    // После перезапуска бота мб случай, когда мы уже
+                    // начали набирать состав, поэтому не стоит спамить
+                    sendMessage("Набираем состав на " + dayService.getDay());
+                }
             }
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JsonProcessingException e) {
             e.printStackTrace();
         }
     }
@@ -115,7 +112,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             validateChat(message);
         } catch (TeamException e) {
-            sendMessage(message, e.getLocalizedMessage());
+            sendMessageToSender(message, e.getLocalizedMessage());
             return;
         }
 
@@ -131,49 +128,49 @@ public class TelegramBot extends TelegramLongPollingBot {
             switch (message.getText().replaceAll(" ", "").toUpperCase()) {
                 case Constants.TEAM:
                     String teamReport = team.getTeamReport(dayService.getDay());
-                    sendMessage(message, teamReport);
+                    sendMessage(teamReport);
                     break;
                 case Constants.ADD_ME:
-                    if (!isReadyToSet(message)) {
+                    if (!isReadyToSet()) {
                         return;
                     }
                     String addSelf = team.addSelf(getFrom(message));
                     teamService.save(team);
-                    sendMessage(message, addSelf);
+                    sendMessage(addSelf);
                     break;
                 case Constants.DO_NOT_KNOW:
-                    if (!isReadyToSet(message)) {
+                    if (!isReadyToSet()) {
                         return;
                     }
                     String doNotKnow = team.doNotKnow(getFrom(message));
                     teamService.save(team);
-                    sendMessage(message, doNotKnow);
+                    sendMessage(doNotKnow);
                     break;
                 case Constants.REMOVE_ME:
-                    if (!isReadyToSet(message)) {
+                    if (!isReadyToSet()) {
                         return;
                     }
                     String removeMe = team.removeMe(getFrom(message));
                     teamService.save(team);
-                    sendMessage(message, removeMe);
+                    sendMessage(removeMe);
                     break;
                 case Constants.HELP:
                     String help = getHelp();
-                    sendMessage(message, help);
+                    sendMessage(help);
                     break;
                 case Constants.CLEAR:
-                    if (!isReadyToSet(message)) {
+                    if (!isReadyToSet()) {
                         return;
                     }
                     CLEAR_CODE = generateCode();
                     CLEAR_TIMESTAMP = System.currentTimeMillis();
-                    sendMessage(message, "Для сброса состава отправьте код '" + CLEAR_CODE + "' в течение минуты");
+                    sendMessage("Для сброса состава отправьте код '" + CLEAR_CODE + "' в течение минуты");
                     break;
                 default:
                     break;
             }
         } catch (TeamException | JsonProcessingException e) {
-            sendMessage(message, e.getLocalizedMessage());
+            sendMessage("Какая-то ошибка при обработке запроса: " + e.getLocalizedMessage());
         }
     }
 
@@ -182,7 +179,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         teamService.save(team);
         CLEAR_TIMESTAMP = 0L;
         CLEAR_CODE = StringUtils.EMPTY;
-        sendMessage(message, getFrom(message) + " сбросил состав");
+        sendMessage(getFrom(message) + " сбросил состав");
     }
 
     private boolean isClearCode(Message message) {
@@ -202,35 +199,33 @@ public class TelegramBot extends TelegramLongPollingBot {
     private boolean processFriends(Message message) throws JsonProcessingException {
         String formattedText = message.getText().replaceAll(" ", "").toUpperCase();
         if (Constants.PLUS_PATTERN.matcher(formattedText).matches()) {
-            if (!isReadyToSet(message)) {
+            if (!isReadyToSet()) {
                 return true;
             }
             int number = Integer.parseInt(formattedText.substring(1));
             String addFriends = team.addFriends(getFrom(message), number);
             teamService.save(team);
-            sendMessage(message, addFriends);
+            sendMessage(addFriends);
             return true;
         }
         if (Constants.MINUS_PATTERN.matcher(formattedText).matches()) {
-            if (!isReadyToSet(message)) {
+            if (!isReadyToSet()) {
                 return true;
             }
             int number = Integer.parseInt(formattedText.substring(1));
             String removeFriends = team.removeFriends(getFrom(message), number);
             teamService.save(team);
-            sendMessage(message, removeFriends);
+            sendMessage(removeFriends);
             return true;
         }
         return false;
     }
 
     private void validateChat(Message message) {
-        String type = message.getChat().getType();
-        String title = message.getChat().getTitle();
-        if (!("group".equals(type) || "supergroup".equals(type)) || !CHAT_NAME.contains(title)) {
+        String id = String.valueOf(message.getChat().getId());
+        if (!CHAT_ID.equals(id)) {
             throw new TeamException("Этот бот не предназначен для данного чата");
         }
-        chatID = message.getChatId();
     }
 
     private String getHelp() {
@@ -269,7 +264,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void sendMessage(String message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(chatID.toString());
+        sendMessage.setChatId(CHAT_ID);
         sendMessage.setText(message);
 
         try {
@@ -279,7 +274,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendMessage(Message message, String text) {
+    public void sendMessageToSender(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(message.getChatId().toString());
@@ -292,11 +287,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private boolean isReadyToSet(Message message) {
+    private boolean isReadyToSet() {
         if (isReadyToSet) {
             return true;
         }
-        sendMessage(message, "Возможность изменения состава будет доступна после оповещения");
+        sendMessage("Возможность изменения состава будет доступна после оповещения");
         return false;
     }
 
