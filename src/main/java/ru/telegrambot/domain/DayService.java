@@ -21,6 +21,10 @@ public class DayService {
 
     @Value("${domain.football.check-in-before-hours}")
     private String CHECK_IN_BEFORE;
+
+    @Value("${domain.football.send-team-report-before-hours}")
+    private String SEND_TEAM_REPORT_BEFORE;
+
     private String footballDay;
     private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("d MMMM H:mm", new Locale("ru"));
 
@@ -38,8 +42,12 @@ public class DayService {
         }
     }
 
-    public boolean isFootballSoon() throws IllegalAccessException {
+    public boolean isTimeToCheckIn() throws IllegalAccessException {
         return getNearestDate().minusHours(Long.parseLong(CHECK_IN_BEFORE)).isBefore(LocalDateTime.now());
+    }
+
+    public boolean isTimeToSendTeamReport() throws IllegalAccessException {
+        return getNearestDate().minusHours(Long.parseLong(SEND_TEAM_REPORT_BEFORE)).isBefore(LocalDateTime.now());
     }
 
     private LocalDateTime getNearestDate() throws IllegalAccessException {

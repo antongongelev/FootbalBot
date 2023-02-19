@@ -6,10 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Team {
 
-    private HashMap<String, PlayerData> team = new HashMap<>();
+    private HashMap<String, PlayerData> team = new LinkedHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public Team() {
@@ -56,10 +60,13 @@ public class Team {
 
     private String getPlayers() {
         StringBuilder builder = new StringBuilder();
-        team.entrySet()
-            .stream()
-            .filter(this::isRelevantPlayer)
-            .forEach(e -> builder.append(getPlayerReport(e)));
+        List<Map.Entry<String, PlayerData>> relevantPlayers = team.entrySet()
+                                                                  .stream()
+                                                                  .filter(this::isRelevantPlayer)
+                                                                  .collect(Collectors.toList());
+        for (int i = 0; i < relevantPlayers.size(); i++) {
+            builder.append(getPlayerReport(relevantPlayers.get(i), i));
+        }
         if (StringUtils.isEmpty(builder.toString())) {
             builder.append("Пока никого...").append(System.lineSeparator());
         }
@@ -70,12 +77,15 @@ public class Team {
         return (Status.READY == player.getValue().getStatus() || Status.DOES_NOT_KNOW == player.getValue().getStatus()) || player.getValue().getCalledPlayers() > 0;
     }
 
-    private String getPlayerReport(java.util.Map.Entry<String, PlayerData> player) {
+    private String getPlayerReport(Map.Entry<String, PlayerData> player, int i) {
         int called = player.getValue().getCalledPlayers();
-        if (called <= 0) {
-            return player.getKey() + " -> " + player.getValue().getStatus().getStatus() + System.lineSeparator();
-        }
-        return player.getKey() + " -> " + player.getValue().getStatus().getStatus() + ". Позвал +" + called + System.lineSeparator();
+        return ++i +
+                ". " +
+                player.getKey() +
+                " -> " +
+                player.getValue().getStatus().getStatus() +
+                (called > 0 ? ". Позвал +" + called : "") +
+                System.lineSeparator();
     }
 
     public String addSelf(String player) {
@@ -85,15 +95,18 @@ public class Team {
             team.put(player, data);
             return player + " вписался. Итого: " + getTotal();
         } else {
-            Status status = playerData.getStatus();
-            if (Status.READY == status) {
+            Status oldStatus = playerData.getStatus();
+            if (Status.READY == oldStatus) {
                 return player + " попытался вписаться, хотя уже был вписан";
             }
             playerData.setStatus(Status.READY);
-            if (Status.CALLED_FRIENDS == status) {
+            // удалим и пересохраним в конец списка
+            team.remove(player);
+            team.put(player, playerData);
+            if (Status.CALLED_FRIENDS == oldStatus) {
                 return player + " вписался. Итого: " + getTotal();
             }
-            return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.READY.getStatus() + "'. Итого: " + getTotal();
+            return player + " поменял статус с '" + oldStatus.getStatus() + "' на '" + Status.READY.getStatus() + "'. Итого: " + getTotal();
         }
     }
 

@@ -39,7 +39,18 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${domain.football.check-in-before-hours}")
     private String CHECK_IN_BEFORE;
 
+    @Value("${domain.football.send-team-report-before-hours}")
+    private String SEND_TEAM_REPORT_BEFORE;
+
+    @Value("${domain.football.is-ignore-interrogation}")
+    private String IS_IGNORE_INTERROGATION;
+
+    @Value("${domain.football.is-ignore-addition}")
+    private String IS_IGNORE_ADDITION;
+
     private boolean isReadyToSet;
+
+    private boolean isTeamReportSent;
 
     private static String CLEAR_CODE = StringUtils.EMPTY;
 
@@ -64,6 +75,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             System.out.println("TOKEN: " + BOT_TOKEN);
             System.out.println("FOOTBALL_DAY: " + FOOTBALL_DAY);
             System.out.println("CHECK_IN_BEFORE_HOURS: " + CHECK_IN_BEFORE);
+            System.out.println("SEND_TEAM_REPORT_BEFORE_HOURS: " + SEND_TEAM_REPORT_BEFORE);
+            System.out.println("IS_IGNORE_ADDITION: " + IS_IGNORE_ADDITION);
+            System.out.println("IS_IGNORE_INTERROGATION: " + IS_IGNORE_INTERROGATION);
         } catch (TelegramApiException e) {
             throw new BeanInitializationException("Cannot register TelegramBot: ", e);
         }
@@ -72,11 +86,13 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Scheduled(fixedDelay = 300_000)
     public void task() {
 
+        // Проверим день
         try {
             dayService.validateDay();
         } catch (TeamException e) {
             team = new Team();
             isReadyToSet = false;
+            isTeamReportSent = false;
             try {
                 teamService.save(team);
             } catch (JsonProcessingException ex) {
@@ -87,8 +103,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
 
+        // Проверим, можно ли записываться
         try {
-            if (!isReadyToSet && dayService.isFootballSoon()) {
+            if (!isReadyToSet && dayService.isTimeToCheckIn()) {
                 isReadyToSet = true;
 
                 Team loadedTeam = teamService.load();
@@ -97,6 +114,20 @@ public class TelegramBot extends TelegramLongPollingBot {
                     // начали набирать состав, поэтому не стоит спамить
                     sendMessage("Набираем состав на " + dayService.getDay());
                 }
+            }
+        } catch (IllegalAccessException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        // Проверим, нужно ли оповещение о составе
+        try {
+            if (!isTeamReportSent && dayService.isTimeToSendTeamReport()) {
+                isTeamReportSent = true;
+
+                team = teamService.load();
+                String teamReport = team.getTeamReport(dayService.getDay());
+                sendMessage("Футбол скоро начнется...");
+                sendMessage(teamReport);
             }
         } catch (IllegalAccessException | JsonProcessingException e) {
             e.printStackTrace();
@@ -139,7 +170,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendMessage(addSelf);
                     break;
                 case Constants.DO_NOT_KNOW:
-                    if (!isReadyToSet()) {
+                    if (isIgnoreInterrogation() || !isReadyToSet()) {
                         return;
                     }
                     String doNotKnow = team.doNotKnow(getFrom(message));
@@ -174,6 +205,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    private boolean isIgnoreInterrogation() {
+        return Boolean.parseBoolean(IS_IGNORE_INTERROGATION);
+    }
+
+    private boolean isIgnoreAddition() {
+        return Boolean.parseBoolean(IS_IGNORE_ADDITION);
+    }
+
     private void processClear(Message message) throws JsonProcessingException {
         team = new Team();
         teamService.save(team);
@@ -199,7 +238,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private boolean processFriends(Message message) throws JsonProcessingException {
         String formattedText = message.getText().replaceAll(" ", "").toUpperCase();
         if (Constants.PLUS_PATTERN.matcher(formattedText).matches()) {
-            if (!isReadyToSet()) {
+            if (isIgnoreAddition() || !isReadyToSet()) {
                 return true;
             }
             int number = Integer.parseInt(formattedText.substring(1));
@@ -209,7 +248,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             return true;
         }
         if (Constants.MINUS_PATTERN.matcher(formattedText).matches()) {
-            if (!isReadyToSet()) {
+            if (isIgnoreAddition() || !isReadyToSet()) {
                 return true;
             }
             int number = Integer.parseInt(formattedText.substring(1));

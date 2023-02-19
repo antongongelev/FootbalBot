@@ -1,13 +1,13 @@
 domain:
   bot:
 #     name: FOOTBALL_TEST_ANTON_BOT
-#     token: 6124382389:AAHMcl8ERUekcKYy2nye6j7elTBXyJYcNH4
+#     token: 6124382389:AAHdt2dGUo_cgyYhmSVy-aiooTKa5PWvMI4
 
-    name: CSITeamBot
+#    name: CSITeamBot
     token: 5007880884:AAGwLulWFc-OIbHRD0pnHa57Wqb_sgG01Qo
 
-#    name: AntonTestFootballBot
-#    token: 5095369262:AAF0kOtR8gxfKxZ0fKpUmd98-idk11GXaxk
+#    name: PortugalFootballBot
+#    token: 6055053880:AAG9kbnyelO2bRfVWpYLl5T3SE2CLhOZ_18
   chat:
 #          my test
 #     id: -832578892
@@ -15,11 +15,14 @@ domain:
 #           csi
     id: -1142763396
 
-#       nogom9ch
+#       portugal
 #    id: -1618609142
   football:
     day: Среда_21:00
     check-in-before-hours: 56
+    send-team-report-before-hours: 1
+    is-ignore-addition: false
+    is-ignore-interrogation: false
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/football_bot_db

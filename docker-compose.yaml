@@ -19,6 +19,9 @@ services:
       - DOMAIN_CHAT_NAME='Nogomяch test 2.0'
       - DOMAIN_FOOTBALL_DAY=Среда_20:00;Воскресенье_20:00
       - DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=56
+      - DOMAIN_SEND_TEAM_REPORT_BEFORE_HOURS=1
+      - DOMAIN_IS_IGNORE_ADDITION=true
+      - DOMAIN_IS_IGNORE_INTERROGATION=true
 
   db:
     image: 'postgres'
