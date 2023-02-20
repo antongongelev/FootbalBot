@@ -14,7 +14,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       #  Укажите желаемые настройки для бота ниже (нужны кавычки, если слов несколько):
-      - DOMAIN_CHAT_ID=-832578892
+      - DOMAIN_CHAT_ID=???
       - DOMAIN_BOT_NAME=PortugalFootballBot
       - DOMAIN_BOT_TOKEN=6055053880:AAG9kbnyelO2bRfVWpYLl5T3SE2CLhOZ_18
       - DOMAIN_FOOTBALL_DAY=Среда_20:00;Воскресенье_20:00

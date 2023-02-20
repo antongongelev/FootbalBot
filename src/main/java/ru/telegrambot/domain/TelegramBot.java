@@ -271,9 +271,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         return "Основные команды:" + System.lineSeparator() +
                 "'+' - Идешь сам" + System.lineSeparator() +
                 "'-' - Сливаешься" + System.lineSeparator() +
-                "'?' - Под вопросом" + System.lineSeparator() +
-                "'+n' - Плюсуешь n друзей (1-9)" + System.lineSeparator() +
-                "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator() +
+                (isIgnoreInterrogation() ? "" : "'?' - Под вопросом" + System.lineSeparator()) +
+                (isIgnoreAddition() ? "" : "'+n' - Плюсуешь n друзей (1-9)" + System.lineSeparator() +
+                "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator()) +
                 "'Состав' - Узнать состав" + System.lineSeparator() +
                 "'Сброс' - Сброс состава";
     }
