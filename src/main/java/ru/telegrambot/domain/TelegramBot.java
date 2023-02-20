@@ -269,7 +269,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private String getHelp() {
         return "Основные команды:" + System.lineSeparator() +
-                "'+' - Идешь сам" + System.lineSeparator() +
+                "'+' - Идешь" + System.lineSeparator() +
                 "'-' - Сливаешься" + System.lineSeparator() +
                 (isIgnoreInterrogation() ? "" : "'?' - Под вопросом" + System.lineSeparator()) +
                 (isIgnoreAddition() ? "" : "'+n' - Плюсуешь n друзей (1-9)" + System.lineSeparator() +

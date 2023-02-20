@@ -2,10 +2,12 @@ package ru.telegrambot.domain;
 
 public class PlayerData {
 
+    private long timestamp = System.currentTimeMillis();
     private Status status;
     private int calledPlayers;
 
-    public PlayerData(Status status, int calledPlayers) {
+    public PlayerData(long timestamp, Status status, int calledPlayers) {
+        this.timestamp = timestamp;
         this.status = status;
         this.calledPlayers = calledPlayers;
     }
@@ -30,5 +32,13 @@ public class PlayerData {
 
     public void setCalledPlayers(int calledPlayers) {
         this.calledPlayers = calledPlayers;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

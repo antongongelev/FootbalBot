@@ -5,15 +5,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Team {
 
-    private HashMap<String, PlayerData> team = new LinkedHashMap<>();
+    private HashMap<String, PlayerData> team = new HashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public Team() {
@@ -63,7 +63,9 @@ public class Team {
         List<Map.Entry<String, PlayerData>> relevantPlayers = team.entrySet()
                                                                   .stream()
                                                                   .filter(this::isRelevantPlayer)
+                                                                  .sorted(Comparator.comparingLong(o -> o.getValue().getTimestamp()))
                                                                   .collect(Collectors.toList());
+
         for (int i = 0; i < relevantPlayers.size(); i++) {
             builder.append(getPlayerReport(relevantPlayers.get(i), i));
         }
@@ -95,18 +97,17 @@ public class Team {
             team.put(player, data);
             return player + " вписался. Итого: " + getTotal();
         } else {
-            Status oldStatus = playerData.getStatus();
-            if (Status.READY == oldStatus) {
+            Status status = playerData.getStatus();
+            if (Status.READY == status) {
                 return player + " попытался вписаться, хотя уже был вписан";
             }
             playerData.setStatus(Status.READY);
-            // удалим и пересохраним в конец списка
-            team.remove(player);
-            team.put(player, playerData);
-            if (Status.CALLED_FRIENDS == oldStatus) {
+            // обновим время записи
+            playerData.setTimestamp(System.currentTimeMillis());
+            if (Status.CALLED_FRIENDS == status) {
                 return player + " вписался. Итого: " + getTotal();
             }
-            return player + " поменял статус с '" + oldStatus.getStatus() + "' на '" + Status.READY.getStatus() + "'. Итого: " + getTotal();
+            return player + " поменял статус с '" + status.getStatus() + "' на '" + Status.READY.getStatus() + "'. Итого: " + getTotal();
         }
     }
 
