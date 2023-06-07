@@ -1,12 +1,12 @@
 package ru.telegrambot.domain;
 
-import java.time.DayOfWeek;
 import java.util.regex.Pattern;
 
 public interface Constants {
 
     String TEAM = "СОСТАВ";
     String HELP = "/HELP";
+    String UPDATE_DAY = "РАСПИСАНИЕ";
     String CLEAR = "СБРОС";
     String ADD_ME = "+";
     String REMOVE_ME = "-";

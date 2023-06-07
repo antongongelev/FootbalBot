@@ -42,6 +42,31 @@ public class DayService {
         }
     }
 
+    public boolean updateDay(String footballDay) {
+        boolean isFootballDayValid = Arrays.stream(footballDay.split(";")).map(String::trim).allMatch(i -> {
+            try {
+                String day = i.substring(0, i.indexOf('-'));
+                String hour = i.substring(i.indexOf('-') + 1, i.indexOf(':'));
+                String minute = i.substring(i.indexOf(':') + 1);
+
+                boolean isDayValid = getDayOfWeek(day) != null;
+                boolean isHourValid = 0 <= Integer.parseInt(hour) && Integer.parseInt(hour) <= 23;
+                boolean isMinuteValid = 0 <= Integer.parseInt(minute) && Integer.parseInt(minute) <= 59;
+
+                return isDayValid && isHourValid && isMinuteValid;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+
+        if (!isFootballDayValid) {
+            return false;
+        }
+
+        FOOTBALL_DAY = footballDay;
+        return true;
+    }
+
     public boolean isTimeToCheckIn() throws IllegalAccessException {
         return getNearestDate().minusHours(Long.parseLong(CHECK_IN_BEFORE)).isBefore(LocalDateTime.now());
     }
@@ -56,8 +81,8 @@ public class DayService {
             try {
                 LocalDateTime now = LocalDateTime.now();
 
-                String day = i.substring(0, i.indexOf('_'));
-                String hour = i.substring(i.indexOf('_') + 1, i.indexOf(':'));
+                String day = i.substring(0, i.indexOf('-'));
+                String hour = i.substring(i.indexOf('-') + 1, i.indexOf(':'));
                 String minute = i.substring(i.indexOf(':') + 1);
 
                 if (now.getDayOfWeek() == getDayOfWeek(day) &&

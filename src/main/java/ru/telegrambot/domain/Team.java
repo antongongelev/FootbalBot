@@ -27,10 +27,10 @@ public class Team {
         team = mapper.readValue(jsonInput, typeRef);
     }
 
-    public String getTeamReport(String footballDay) {
+    public String getTeamReport(String footballDay, boolean isStrictEnroll) {
         return "Состав на " + footballDay + ": " + System.lineSeparator()
                 + Constants.DELIMITER + System.lineSeparator()
-                + getPlayers()
+                + getPlayers(isStrictEnroll)
                 + Constants.DELIMITER + System.lineSeparator()
                 + "Итого: " + getTotal();
     }
@@ -58,7 +58,7 @@ public class Team {
         return (int) team.values().stream().filter(p -> Status.DOES_NOT_KNOW == p.getStatus()).count();
     }
 
-    private String getPlayers() {
+    private String getPlayers(boolean isStrictEnroll) {
         StringBuilder builder = new StringBuilder();
         List<Map.Entry<String, PlayerData>> relevantPlayers = team.entrySet()
                                                                   .stream()
@@ -67,7 +67,7 @@ public class Team {
                                                                   .collect(Collectors.toList());
 
         for (int i = 0; i < relevantPlayers.size(); i++) {
-            builder.append(getPlayerReport(relevantPlayers.get(i), i));
+            builder.append(getPlayerReport(relevantPlayers.get(i), i, isStrictEnroll));
         }
         if (StringUtils.isEmpty(builder.toString())) {
             builder.append("Пока никого...").append(System.lineSeparator());
@@ -79,14 +79,12 @@ public class Team {
         return (Status.READY == player.getValue().getStatus() || Status.DOES_NOT_KNOW == player.getValue().getStatus()) || player.getValue().getCalledPlayers() > 0;
     }
 
-    private String getPlayerReport(Map.Entry<String, PlayerData> player, int i) {
+    private String getPlayerReport(Map.Entry<String, PlayerData> player, int i, boolean isStrictEnroll) {
         int called = player.getValue().getCalledPlayers();
         return ++i +
                 ". " +
                 player.getKey() +
-                " -> " +
-                player.getValue().getStatus().getStatus() +
-                (called > 0 ? ". Позвал +" + called : "") +
+                (isStrictEnroll ? "" : (" -> " + player.getValue().getStatus().getStatus() + (called > 0 ? ". Позвал +" + called : ""))) +
                 System.lineSeparator();
     }
 
