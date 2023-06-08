@@ -1,25 +1,26 @@
 domain:
   bot:
-#     name: FOOTBALL_TEST_ANTON_BOT
-#     token: 6124382389:AAHdt2dGUo_cgyYhmSVy-aiooTKa5PWvMI4
+     name: FOOTBALL_TEST_ANTON_BOT
+     token: 6124382389:AAHdt2dGUo_cgyYhmSVy-aiooTKa5PWvMI4
 
-    name: CSITeamBot
-    token: 5007880884:AAGwLulWFc-OIbHRD0pnHa57Wqb_sgG01Qo
+#    name: CSITeamBot
+#    token: 5007880884:AAGwLulWFc-OIbHRD0pnHa57Wqb_sgG01Qo
 
 #    name: PortugalFootballBot
 #    token: 6055053880:AAG9kbnyelO2bRfVWpYLl5T3SE2CLhOZ_18
   chat:
 #          my test
-#     id: -832578892
+     id: -832578892
 
 #           csi
-    id: -1001142763396
+#    id: -1001142763396
 
 #       portugal
 #    id: -100840047547
   football:
-    day: Среда_21:00
-    check-in-before-hours: 56
+    day: Среда-21:00
+    check-in-before-hours: 60
+    check-in-hour: 12
     send-team-report-before-hours: 1
     is-ignore-addition: false
     is-ignore-interrogation: false
