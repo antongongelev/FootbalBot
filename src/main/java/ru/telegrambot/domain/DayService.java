@@ -86,7 +86,7 @@ public class DayService {
     }
 
     public boolean updateDay(String footballDay) throws Exception {
-        boolean isFootballDayValid = Arrays.stream(footballDay.split(";")).map(String::trim).allMatch(i -> {
+        boolean isFootballDayValid = Arrays.stream(footballDay.split(",")).map(String::trim).allMatch(i -> {
             try {
                 String day = i.substring(0, i.indexOf('-'));
                 String hour = i.substring(i.indexOf('-') + 1, i.indexOf(':'));
@@ -125,7 +125,7 @@ public class DayService {
 
     private FootballDate getNearestDate() throws Exception {
 
-        Optional<FootballDate> nearest = Arrays.stream(FOOTBALL_DAY.split(";")).map(String::trim).map(i -> {
+        Optional<FootballDate> nearest = Arrays.stream(FOOTBALL_DAY.split(",")).map(String::trim).map(i -> {
             try {
                 LocalDateTime now = LocalDateTime.now();
 
