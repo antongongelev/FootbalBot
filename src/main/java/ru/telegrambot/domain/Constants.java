@@ -11,6 +11,8 @@ public interface Constants {
     String ADD_ME = "+";
     String REMOVE_ME = "-";
     String DO_NOT_KNOW = "?";
+    String PLACE = "МЕСТО";
+    String DURATION = "ДЛИТЕЛЬНОСТЬ";
     Pattern MINUS_PATTERN = Pattern.compile("[-][1-9]");
     Pattern PLUS_PATTERN = Pattern.compile("[+][1-9]");
     String DELIMITER = "======================";

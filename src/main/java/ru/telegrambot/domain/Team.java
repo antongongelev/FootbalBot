@@ -27,8 +27,10 @@ public class Team {
         team = mapper.readValue(jsonInput, typeRef);
     }
 
-    public String getTeamReport(String footballDay, boolean isStrictEnroll) {
-        return "Состав на " + footballDay + ": " + System.lineSeparator()
+    public String getTeamReport(String footballDay, String duration, String place, boolean isStrictEnroll) {
+        return "Состав на " + footballDay + System.lineSeparator()
+                + "Длительность: " + (StringUtils.isBlank(duration) ? "?" : duration) + System.lineSeparator()
+                + "Место: " + (StringUtils.isBlank(place) ? "?" : place) + System.lineSeparator()
                 + Constants.DELIMITER + System.lineSeparator()
                 + getPlayers(isStrictEnroll)
                 + Constants.DELIMITER + System.lineSeparator()

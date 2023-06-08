@@ -39,6 +39,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${domain.football.check-in-before-hours}")
     private String CHECK_IN_BEFORE;
 
+    @Value("${domain.football.check-in-hour}")
+    private String CHECK_IN_HOUR;
+
     @Value("${domain.football.send-team-report-before-hours}")
     private String SEND_TEAM_REPORT_BEFORE;
 
@@ -78,6 +81,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
             System.out.println("FOOTBALL_DAY: " + FOOTBALL_DAY);
+            System.out.println("CHECK_IN_HOUR: " + CHECK_IN_HOUR);
             System.out.println("CHECK_IN_BEFORE_HOURS: " + CHECK_IN_BEFORE);
             System.out.println("SEND_TEAM_REPORT_BEFORE_HOURS: " + SEND_TEAM_REPORT_BEFORE);
             System.out.println("IS_IGNORE_ADDITION: " + IS_IGNORE_ADDITION);
@@ -104,7 +108,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 ex.printStackTrace();
             }
             sendMessage(e.getLocalizedMessage());
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -120,7 +124,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendMessage("Набираем состав на " + dayService.getDay());
                 }
             }
-        } catch (IllegalAccessException | JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -130,11 +134,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 isTeamReportSent = true;
 
                 team = teamService.load();
-                String teamReport = team.getTeamReport(dayService.getDay(), isStrictEnroll);
+                String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getDay(), isStrictEnroll);
                 sendMessage("Футбол скоро начнется...");
                 sendMessage(teamReport);
             }
-        } catch (IllegalAccessException | JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -165,9 +169,17 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (processFriends(message)) {
                 return;
             }
+            if (isSetPlaceCommand(message)) {
+                setPlace(message);
+                return;
+            }
+            if (isSetDurationCommand(message)) {
+                setDuration(message);
+                return;
+            }
             switch (message.getText().replaceAll(" ", "").toUpperCase()) {
                 case Constants.TEAM:
-                    String teamReport = team.getTeamReport(dayService.getDay(), isStrictEnroll);
+                    String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getPlace(), isStrictEnroll);
                     sendMessage(teamReport);
                     break;
                 case Constants.ADD_ME:
@@ -214,9 +226,34 @@ public class TelegramBot extends TelegramLongPollingBot {
                 default:
                     break;
             }
-        } catch (TeamException | JsonProcessingException e) {
-            sendMessage("Какая-то ошибка при обработке запроса: " + e.getLocalizedMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendMessage("Какая-то ошибка");
         }
+    }
+
+    private void setPlace(Message message) {
+        if (dayService.setPlace(message.getText())) {
+            sendMessage("Место ближайшей игры успешно изменено");
+            return;
+        }
+        sendMessage("Не удалось изменить место ближайшей игры");
+    }
+
+    private void setDuration(Message message) {
+        if (dayService.setDuration(message.getText())) {
+            sendMessage("Длительность ближайшей игры успешно изменена");
+            return;
+        }
+        sendMessage("Не удалось изменить длительность ближайшей игры");
+    }
+
+    private boolean isSetPlaceCommand(Message message) {
+        return message.getText().toUpperCase().startsWith(Constants.PLACE) && message.getText().length() > Constants.PLACE.length();
+    }
+
+    private boolean isSetDurationCommand(Message message) {
+        return message.getText().toUpperCase().startsWith(Constants.DURATION) && message.getText().length() > Constants.DURATION.length();
     }
 
     private boolean isDayUpdate() {
@@ -232,7 +269,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         return false;
     }
 
-    private void updateDay(Message message) {
+    private void updateDay(Message message) throws Exception {
         boolean success = dayService.updateDay(message.getText());
         if (!success) {
             sendMessage("Не удалось обновить расписание" + System.lineSeparator() + "Расписание остается прежним:" + System.lineSeparator() + FOOTBALL_DAY);
@@ -305,7 +342,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private String getHelp() {
-        return "Основные команды:" + System.lineSeparator() +
+        return "Основные команды, напиши в чат без кавычек:" + System.lineSeparator() +
                 "'+' - Идешь" + System.lineSeparator() +
                 "'-' - Сливаешься" + System.lineSeparator() +
                 (isIgnoreInterrogation() ? "" : "'?' - Под вопросом" + System.lineSeparator()) +
@@ -313,7 +350,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                         "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator()) +
                 "'Состав' - Узнать состав" + System.lineSeparator() +
                 "'Сброс' - Сброс состава" + System.lineSeparator() +
-                "'Расписание' - Измененить расписание";
+                "'Расписание' - Указать дни и время" + System.lineSeparator() +
+                "'Место XXX' - Указать место проведения ближайшей игры, можно ссылку на карту" + System.lineSeparator() +
+                "'Длительность X' - Указать продолжительность ближайшей игры";
     }
 
     private String getFrom(Message message) {
