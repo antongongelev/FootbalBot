@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   app:
-    image: 'antongongelev/football'
+    image: 'antongongelev/football:version2.0'
     ports:
       - "8787:8787"
     depends_on:
