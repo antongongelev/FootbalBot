@@ -114,7 +114,7 @@ public class DayService {
 
     public boolean isTimeToCheckIn() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        boolean isCheckInHour = now.getHour() == Integer.parseInt(CHECK_IN_BEFORE);
+        boolean isCheckInHour = now.getHour() == Integer.parseInt(CHECK_IN_HOUR);
         boolean isBefore = getNearestDate().getDate().minusHours(Long.parseLong(CHECK_IN_BEFORE)).isBefore(now);
         return isCheckInHour && isBefore;
     }
