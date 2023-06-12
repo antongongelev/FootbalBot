@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Team {
@@ -27,12 +28,13 @@ public class Team {
         team = mapper.readValue(jsonInput, typeRef);
     }
 
-    public String getTeamReport(String footballDay, String duration, String place, boolean isStrictEnroll) {
+    public String getTeamReport(String footballDay, String duration, String place, Integer maxPlayers, boolean isStrictEnroll) {
         return "Состав на " + footballDay + System.lineSeparator()
-                + "Длительность: " + (StringUtils.isBlank(duration) ? "?" : duration) + System.lineSeparator()
                 + "Место: " + (StringUtils.isBlank(place) ? "?" : place) + System.lineSeparator()
+                + "Длительность: " + (StringUtils.isBlank(duration) ? "?" : duration) + System.lineSeparator()
+                + (isStrictEnroll ? "Игроки: " + (Objects.isNull(maxPlayers) ? "?" : maxPlayers) + System.lineSeparator() : "")
                 + Constants.DELIMITER + System.lineSeparator()
-                + getPlayers(isStrictEnroll)
+                + getPlayers(isStrictEnroll, maxPlayers)
                 + Constants.DELIMITER + System.lineSeparator()
                 + "Итого: " + getTotal();
     }
@@ -60,7 +62,7 @@ public class Team {
         return (int) team.values().stream().filter(p -> Status.DOES_NOT_KNOW == p.getStatus()).count();
     }
 
-    private String getPlayers(boolean isStrictEnroll) {
+    private String getPlayers(boolean isStrictEnroll, Integer maxPlayers) {
         StringBuilder builder = new StringBuilder();
         List<Map.Entry<String, PlayerData>> relevantPlayers = team.entrySet()
                                                                   .stream()
@@ -69,7 +71,7 @@ public class Team {
                                                                   .collect(Collectors.toList());
 
         for (int i = 0; i < relevantPlayers.size(); i++) {
-            builder.append(getPlayerReport(relevantPlayers.get(i), i, isStrictEnroll));
+            builder.append(getPlayerReport(relevantPlayers.get(i), i, isStrictEnroll, maxPlayers));
         }
         if (StringUtils.isEmpty(builder.toString())) {
             builder.append("Пока никого...").append(System.lineSeparator());
@@ -81,12 +83,12 @@ public class Team {
         return (Status.READY == player.getValue().getStatus() || Status.DOES_NOT_KNOW == player.getValue().getStatus()) || player.getValue().getCalledPlayers() > 0;
     }
 
-    private String getPlayerReport(Map.Entry<String, PlayerData> player, int i, boolean isStrictEnroll) {
+    private String getPlayerReport(Map.Entry<String, PlayerData> player, int i, boolean isStrictEnroll, Integer maxPlayers) {
         int called = player.getValue().getCalledPlayers();
-        return ++i +
+        return (i + 1) +
                 ". " +
                 player.getKey() +
-                (isStrictEnroll ? "" : (" -> " + player.getValue().getStatus().getStatus() + (called > 0 ? ". Позвал +" + called : ""))) +
+                (isStrictEnroll ? ((Objects.isNull(maxPlayers) || (i + 1) <= maxPlayers) ? "" : " -> Запасной") : (" -> " + player.getValue().getStatus().getStatus() + (called > 0 ? ". Позвал +" + called : ""))) +
                 System.lineSeparator();
     }
 

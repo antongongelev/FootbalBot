@@ -67,6 +67,27 @@ public class DayService {
         }
     }
 
+    public boolean setMaxPlayers(String text) {
+        try {
+            String period = getNearestDate().getPeriod();
+            Integer maxPlayers = Integer.valueOf(StringUtils.removeStartIgnoreCase(text, Constants.MAX_PLAYERS).trim());
+            if (maxPlayers < 1) {
+                return false;
+            }
+            FootballData oldData = footballData.get(period);
+            if (oldData == null) {
+                FootballData newData = new FootballData();
+                newData.setMaxPlayers(maxPlayers);
+                footballData.put(period, newData);
+                return true;
+            }
+            oldData.setMaxPlayers(maxPlayers);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean setDuration(String text) {
         try {
             String period = getNearestDate().getPeriod();
@@ -107,7 +128,6 @@ public class DayService {
         }
 
         FOOTBALL_DAY = footballDay;
-        footballData.clear();
         this.footballDay = getNearest();
         return true;
     }
@@ -137,11 +157,11 @@ public class DayService {
                         (now.getHour() < Integer.parseInt(hour) || now.getHour() == Integer.parseInt(hour) && now.getMinute() < Integer.parseInt(minute))) {
 
                     LocalDateTime date = now.withHour(Integer.parseInt(hour)).withMinute(Integer.parseInt(minute));
-                    return new FootballDate(i, date);
+                    return new FootballDate(i.toUpperCase(), date);
                 }
 
                 LocalDateTime date = now.with(TemporalAdjusters.next(getDayOfWeek(day))).withHour(Integer.parseInt(hour)).withMinute(Integer.parseInt(minute));
-                return new FootballDate(i, date);
+                return new FootballDate(i.toUpperCase(), date);
 
             } catch (Exception e) {
                 throw new RuntimeException("Неверно заданы дни футбола");
@@ -177,6 +197,14 @@ public class DayService {
             return Optional.ofNullable(footballData.get(getNearestDate().getPeriod())).map(FootballData::getDuration).orElse(StringUtils.EMPTY);
         } catch (IllegalAccessException e) {
             return StringUtils.EMPTY;
+        }
+    }
+
+    public Integer getMaxPlayers() throws Exception {
+        try {
+            return Optional.ofNullable(footballData.get(getNearestDate().getPeriod())).map(FootballData::getMaxPlayers).orElse(null);
+        } catch (IllegalAccessException e) {
+            return null;
         }
     }
 

@@ -116,13 +116,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             if (!isReadyToSet && dayService.isTimeToCheckIn()) {
                 isReadyToSet = true;
-
-                Team loadedTeam = teamService.load();
-                if (loadedTeam.getTeam().isEmpty()) {
-                    // После перезапуска бота мб случай, когда мы уже
-                    // начали набирать состав, поэтому не стоит спамить
-                    sendMessage("Набираем состав на " + dayService.getDay());
-                }
+                sendMessage("Набираем состав на " + dayService.getDay());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +128,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 isTeamReportSent = true;
 
                 team = teamService.load();
-                String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getDay(), isStrictEnroll);
+                String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getPlace(), dayService.getMaxPlayers(), isStrictEnroll);
                 sendMessage("Футбол скоро начнется...");
                 sendMessage(teamReport);
             }
@@ -173,13 +167,18 @@ public class TelegramBot extends TelegramLongPollingBot {
                 setPlace(message);
                 return;
             }
+            if (isSetMaxPlayersCommand(message)) {
+                setMaxPlayers(message);
+                return;
+            }
             if (isSetDurationCommand(message)) {
                 setDuration(message);
                 return;
             }
             switch (message.getText().replaceAll(" ", "").toUpperCase()) {
                 case Constants.TEAM:
-                    String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getPlace(), isStrictEnroll);
+                    String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getPlace(), dayService.getMaxPlayers(),
+                                                           isStrictEnroll);
                     sendMessage(teamReport);
                     break;
                 case Constants.ADD_ME:
@@ -240,12 +239,24 @@ public class TelegramBot extends TelegramLongPollingBot {
         sendMessage("Не удалось изменить место ближайшей игры");
     }
 
+    private void setMaxPlayers(Message message) {
+        if (dayService.setMaxPlayers(message.getText())) {
+            sendMessage("Кол-во игроков на ближайшую игру успешно изменено");
+            return;
+        }
+        sendMessage("Не удалось изменить кол-во игроков на ближайшую игру");
+    }
+
     private void setDuration(Message message) {
         if (dayService.setDuration(message.getText())) {
             sendMessage("Длительность ближайшей игры успешно изменена");
             return;
         }
         sendMessage("Не удалось изменить длительность ближайшей игры");
+    }
+
+    private boolean isSetMaxPlayersCommand(Message message) {
+        return message.getText().toUpperCase().startsWith(Constants.MAX_PLAYERS) && message.getText().length() > Constants.MAX_PLAYERS.length();
     }
 
     private boolean isSetPlaceCommand(Message message) {
@@ -276,6 +287,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             return;
         }
         FOOTBALL_DAY = message.getText();
+        isReadyToSet = false;
+        isTeamReportSent = false;
         sendMessage(getFrom(message) + " обновил расписание" + System.lineSeparator() + "Новое расписание:" + System.lineSeparator() + FOOTBALL_DAY);
     }
 
@@ -351,8 +364,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                 "'Состав' - Узнать состав" + System.lineSeparator() +
                 "'Сброс' - Сброс состава" + System.lineSeparator() +
                 "'Расписание' - Указать дни и время" + System.lineSeparator() +
-                "'Место XXX' - Указать место проведения ближайшей игры, можно ссылку на карту" + System.lineSeparator() +
-                "'Длительность X' - Указать продолжительность ближайшей игры";
+                "'/Место XXX' - Указать место проведения ближайшей игры, можно ссылку на карту" + System.lineSeparator() +
+                "'/Длительность X' - Указать продолжительность ближайшей игры" + System.lineSeparator() +
+                "'/Игроки X' - Указать максимальное кол-во игроков для ближайшей игры";
     }
 
     private String getFrom(Message message) {
