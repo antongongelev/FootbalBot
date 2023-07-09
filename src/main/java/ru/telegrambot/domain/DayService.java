@@ -10,9 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,7 +28,7 @@ public class DayService {
     @Value("${domain.football.send-team-report-before-hours}")
     private String SEND_TEAM_REPORT_BEFORE;
 
-    private final Map<String, FootballData> footballData = new HashMap<>();
+    private final FootballData footballData = new FootballData();
 
     private String footballDay;
     private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("d MMMM H:mm", new Locale("ru"));
@@ -50,60 +48,24 @@ public class DayService {
     }
 
     public boolean setPlace(String text) {
-        try {
-            String period = getNearestDate().getPeriod();
-            String place = StringUtils.removeStartIgnoreCase(text, Constants.PLACE).trim();
-            FootballData oldData = footballData.get(period);
-            if (oldData == null) {
-                FootballData newData = new FootballData();
-                newData.setPlace(place);
-                footballData.put(period, newData);
-                return true;
-            }
-            oldData.setPlace(place);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        String place = StringUtils.removeStartIgnoreCase(text, Constants.PLACE).trim();
+        footballData.setPlace(place);
+        return true;
     }
 
     public boolean setMaxPlayers(String text) {
-        try {
-            String period = getNearestDate().getPeriod();
-            Integer maxPlayers = Integer.valueOf(StringUtils.removeStartIgnoreCase(text, Constants.MAX_PLAYERS).trim());
-            if (maxPlayers < 1) {
-                return false;
-            }
-            FootballData oldData = footballData.get(period);
-            if (oldData == null) {
-                FootballData newData = new FootballData();
-                newData.setMaxPlayers(maxPlayers);
-                footballData.put(period, newData);
-                return true;
-            }
-            oldData.setMaxPlayers(maxPlayers);
-            return true;
-        } catch (Exception e) {
+        int maxPlayers = Integer.parseInt(StringUtils.removeStartIgnoreCase(text, Constants.MAX_PLAYERS).trim());
+        if (maxPlayers < 1) {
             return false;
         }
+        footballData.setMaxPlayers(maxPlayers);
+        return true;
     }
 
     public boolean setDuration(String text) {
-        try {
-            String period = getNearestDate().getPeriod();
-            String duration = StringUtils.removeStartIgnoreCase(text, Constants.DURATION).trim();
-            FootballData oldData = footballData.get(period);
-            if (oldData == null) {
-                FootballData newData = new FootballData();
-                newData.setDuration(duration);
-                footballData.put(period, newData);
-                return true;
-            }
-            oldData.setDuration(duration);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        String duration = StringUtils.removeStartIgnoreCase(text, Constants.DURATION).trim();
+        footballData.setDuration(duration);
+        return true;
     }
 
     public boolean updateDay(String footballDay) throws Exception {
@@ -132,9 +94,9 @@ public class DayService {
         return true;
     }
 
-    public boolean isTimeToCheckIn() throws Exception {
+    public boolean isTimeToCheckIn(boolean checkHour) throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        boolean isCheckInHour = now.getHour() == Integer.parseInt(CHECK_IN_HOUR);
+        boolean isCheckInHour = !checkHour || now.getHour() == Integer.parseInt(CHECK_IN_HOUR);
         boolean isBefore = getNearestDate().getDate().minusHours(Long.parseLong(CHECK_IN_BEFORE)).isBefore(now);
         return isCheckInHour && isBefore;
     }
@@ -189,31 +151,19 @@ public class DayService {
     }
 
     public String getDay() {
-        return footballDay;
+        return "*" + footballDay + "*";
     }
 
-    public String getDuration() throws Exception {
-        try {
-            return Optional.ofNullable(footballData.get(getNearestDate().getPeriod())).map(FootballData::getDuration).orElse(StringUtils.EMPTY);
-        } catch (IllegalAccessException e) {
-            return StringUtils.EMPTY;
-        }
+    public String getDuration() {
+        return Optional.ofNullable(footballData.getDuration()).orElse(StringUtils.EMPTY);
     }
 
-    public Integer getMaxPlayers() throws Exception {
-        try {
-            return Optional.ofNullable(footballData.get(getNearestDate().getPeriod())).map(FootballData::getMaxPlayers).orElse(null);
-        } catch (IllegalAccessException e) {
-            return null;
-        }
+    public Integer getMaxPlayers() {
+        return footballData.getMaxPlayers();
     }
 
-    public String getPlace() throws Exception {
-        try {
-            return Optional.ofNullable(footballData.get(getNearestDate().getPeriod())).map(FootballData::getPlace).orElse(StringUtils.EMPTY);
-        } catch (IllegalAccessException e) {
-            return StringUtils.EMPTY;
-        }
+    public String getPlace() {
+        return Optional.ofNullable(footballData.getPlace()).orElse(StringUtils.EMPTY);
     }
 
     private DayOfWeek getDayOfWeek(String day) throws IllegalAccessException {

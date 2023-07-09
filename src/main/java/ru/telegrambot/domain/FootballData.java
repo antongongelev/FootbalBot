@@ -4,7 +4,6 @@ public class FootballData {
 
     private String duration;
     private String place;
-
     private Integer maxPlayers;
 
     public void setDuration(String duration) {
