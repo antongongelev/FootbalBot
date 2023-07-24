@@ -27,8 +27,8 @@ domain:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/football_bot_db
-    username: postgres
-    password: postgres
+    username: football_bot_user
+    password: football_bot_password
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
