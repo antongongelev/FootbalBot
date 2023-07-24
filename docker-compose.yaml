@@ -30,8 +30,8 @@ services:
       - "5432"
     environment:
       - POSTGRES_DB=football_bot_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=football_bot_user
+      - POSTGRES_PASSWORD=football_bot_password
     healthcheck:
       test: "PGPASSWORD=football_bot_password pg_isready -h 127.0.0.1 -U football_bot_user -d football_bot_db"
       interval: 5s
