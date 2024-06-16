@@ -3,6 +3,9 @@ domain:
      name: FOOTBALL_TEST_ANTON_BOT
      token: 6124382389:AAHdt2dGUo_cgyYhmSVy-aiooTKa5PWvMI4
 
+#    name: GAZ_TEAM_BOT
+#    token: 7395289491:AAELT6VYKVHsJJIWr1EzxLjOjUXfpTUZk9M
+
 #    name: CSITeamBot
 #    token: 5007880884:AAGwLulWFc-OIbHRD0pnHa57Wqb_sgG01Qo
 
@@ -10,7 +13,10 @@ domain:
 #    token: 6055053880:AAG9kbnyelO2bRfVWpYLl5T3SE2CLhOZ_18
   chat:
 #          my test
-     id: -832578892
+     id: -4250078193
+
+    #           gaz
+    #    id: -300581737
 
 #           csi
 #    id: -1001142763396
@@ -20,7 +26,6 @@ domain:
   football:
     day: Среда-21:00
     check-in-before-hours: 60
-    check-in-hour: 12
     send-team-report-before-hours: 1
     is-ignore-addition: false
     is-ignore-interrogation: false

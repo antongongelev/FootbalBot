@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   app:
-    image: 'antongongelev/football:version2.0'
+    image: 'football'
     ports:
       - "8787:8787"
     depends_on:
@@ -14,15 +14,16 @@ services:
       - SPRING_DATASOURCE_PASSWORD=football_bot_password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       #  Укажите желаемые настройки для бота ниже (нужны кавычки, если слов несколько):
-      - DOMAIN_CHAT_ID=-100840047547
-      - DOMAIN_BOT_NAME=PortugalFootballBot
-      - DOMAIN_BOT_TOKEN=6055053880:AAG9kbnyelO2bRfVWpYLl5T3SE2CLhOZ_18
-      - DOMAIN_FOOTBALL_DAY=Среда-20:00,Воскресенье-20:00
-      - DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=60
-      - DOMAIN_FOOTBALL_CHECK_IN_HOUR=12
+
+      - DOMAIN_CHAT_ID=-300581737
+      - DOMAIN_BOT_NAME=GAZ_TEAM_BOT
+      - DOMAIN_BOT_TOKEN=7395289491:AAELT6VYKVHsJJIWr1EzxLjOjUXfpTUZk9M
+
+      - DOMAIN_FOOTBALL_DAY=Вторник-19:00, Суббота-10:00
+      - DOMAIN_FOOTBALL_CHECK_IN_BEFORE_HOURS=48
       - DOMAIN_FOOTBALL_SEND_TEAM_REPORT_BEFORE_HOURS=1
-      - DOMAIN_FOOTBALL_IS_IGNORE_ADDITION=true
-      - DOMAIN_FOOTBALL_IS_IGNORE_INTERROGATION=true
+      - DOMAIN_FOOTBALL_IS_IGNORE_ADDITION=false
+      - DOMAIN_FOOTBALL_IS_IGNORE_INTERROGATION=false
 
   db:
     image: 'postgres'

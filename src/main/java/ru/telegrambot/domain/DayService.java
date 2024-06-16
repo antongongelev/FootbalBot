@@ -22,13 +22,8 @@ public class DayService {
     @Value("${domain.football.check-in-before-hours}")
     private String CHECK_IN_BEFORE;
 
-    @Value("${domain.football.check-in-hour}")
-    private String CHECK_IN_HOUR;
-
     @Value("${domain.football.send-team-report-before-hours}")
     private String SEND_TEAM_REPORT_BEFORE;
-
-    private final FootballData footballData = new FootballData();
 
     private String footballDay;
     private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("d MMMM H:mm", new Locale("ru"));
@@ -45,27 +40,6 @@ public class DayService {
             footballDay = getNearest();
             throw new TeamException("Состав на " + oldDay + " был сброшен. Следующий футбол будет " + nearest);
         }
-    }
-
-    public boolean setPlace(String text) {
-        String place = StringUtils.removeStartIgnoreCase(text, Constants.PLACE).trim();
-        footballData.setPlace(place);
-        return true;
-    }
-
-    public boolean setMaxPlayers(String text) {
-        int maxPlayers = Integer.parseInt(StringUtils.removeStartIgnoreCase(text, Constants.MAX_PLAYERS).trim());
-        if (maxPlayers < 1) {
-            return false;
-        }
-        footballData.setMaxPlayers(maxPlayers);
-        return true;
-    }
-
-    public boolean setDuration(String text) {
-        String duration = StringUtils.removeStartIgnoreCase(text, Constants.DURATION).trim();
-        footballData.setDuration(duration);
-        return true;
     }
 
     public boolean updateDay(String footballDay) throws Exception {
@@ -94,11 +68,9 @@ public class DayService {
         return true;
     }
 
-    public boolean isTimeToCheckIn(boolean checkHour) throws Exception {
+    public boolean isTimeToCheckIn() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        boolean isCheckInHour = !checkHour || now.getHour() == Integer.parseInt(CHECK_IN_HOUR);
-        boolean isBefore = getNearestDate().getDate().minusHours(Long.parseLong(CHECK_IN_BEFORE)).isBefore(now);
-        return isCheckInHour && isBefore;
+        return getNearestDate().getDate().minusHours(Long.parseLong(CHECK_IN_BEFORE)).isBefore(now);
     }
 
     public boolean isTimeToSendTeamReport() throws Exception {
@@ -152,18 +124,6 @@ public class DayService {
 
     public String getDay() {
         return "*" + footballDay + "*";
-    }
-
-    public String getDuration() {
-        return Optional.ofNullable(footballData.getDuration()).orElse(StringUtils.EMPTY);
-    }
-
-    public Integer getMaxPlayers() {
-        return footballData.getMaxPlayers();
-    }
-
-    public String getPlace() {
-        return Optional.ofNullable(footballData.getPlace()).orElse(StringUtils.EMPTY);
     }
 
     private DayOfWeek getDayOfWeek(String day) throws IllegalAccessException {

@@ -39,9 +39,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${domain.football.check-in-before-hours}")
     private String CHECK_IN_BEFORE;
 
-    @Value("${domain.football.check-in-hour}")
-    private String CHECK_IN_HOUR;
-
     @Value("${domain.football.send-team-report-before-hours}")
     private String SEND_TEAM_REPORT_BEFORE;
 
@@ -81,7 +78,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             System.out.println("BOT_NAME: " + BOT_NAME);
             System.out.println("TOKEN: " + BOT_TOKEN);
             System.out.println("FOOTBALL_DAY: " + FOOTBALL_DAY);
-            System.out.println("CHECK_IN_HOUR: " + CHECK_IN_HOUR);
             System.out.println("CHECK_IN_BEFORE_HOURS: " + CHECK_IN_BEFORE);
             System.out.println("SEND_TEAM_REPORT_BEFORE_HOURS: " + SEND_TEAM_REPORT_BEFORE);
             System.out.println("IS_IGNORE_ADDITION: " + IS_IGNORE_ADDITION);
@@ -113,7 +109,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
         // Проверим, можно ли записываться
-        processCheckInValidation(true);
+        processCheckInValidation();
 
         // Проверим, нужно ли оповещение о составе
         try {
@@ -121,7 +117,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 isTeamReportSent = true;
 
                 team = teamService.load();
-                String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getPlace(), dayService.getMaxPlayers(), isStrictEnroll);
+                String teamReport = team.getTeamReport(dayService.getDay(), isStrictEnroll);
                 sendMessage("Футбол скоро начнется...");
                 sendMessage(teamReport);
             }
@@ -130,9 +126,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void processCheckInValidation(boolean checkHour) {
+    private void processCheckInValidation() {
         try {
-            if (!isReadyToSet && dayService.isTimeToCheckIn(checkHour)) {
+            if (!isReadyToSet && dayService.isTimeToCheckIn()) {
                 isReadyToSet = true;
                 sendMessage(
                         "⚽️⚽️⚽️⚽️⚽️⚽️⚽️⚽️⚽️⚽️" +
@@ -144,7 +140,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                                 System.lineSeparator() +
                                 System.lineSeparator() +
                                 "⚽️⚽️⚽️⚽️⚽️⚽️⚽️⚽️⚽️⚽️"
-                           );
+                );
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,22 +173,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (processFriends(message)) {
                 return;
             }
-            if (isSetPlaceCommand(message)) {
-                setPlace(message);
-                return;
-            }
-            if (isSetMaxPlayersCommand(message)) {
-                setMaxPlayers(message);
-                return;
-            }
-            if (isSetDurationCommand(message)) {
-                setDuration(message);
-                return;
-            }
             switch (message.getText().replaceAll(" ", "").toUpperCase()) {
                 case Constants.TEAM:
-                    String teamReport = team.getTeamReport(dayService.getDay(), dayService.getDuration(), dayService.getPlace(), dayService.getMaxPlayers(),
-                                                           isStrictEnroll);
+                    String teamReport = team.getTeamReport(dayService.getDay(), isStrictEnroll);
                     sendMessage(teamReport);
                     break;
                 case Constants.ADD_ME:
@@ -226,7 +209,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case Constants.UPDATE_DAY:
                     DAY_UPDATE_TIMESTAMP = System.currentTimeMillis();
                     sendMessage(String.format("Текущее расписание игр:" + System.lineSeparator() + "'%s'" + System.lineSeparator() + "Отправьте новое расписания в " +
-                                                      "течение минуты", FOOTBALL_DAY));
+                            "течение минуты", FOOTBALL_DAY));
                     break;
                 case Constants.CLEAR:
                     CLEAR_CODE = generateCode();
@@ -240,42 +223,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             e.printStackTrace();
             sendMessage("Какая-то ошибка");
         }
-    }
-
-    private void setPlace(Message message) {
-        if (dayService.setPlace(message.getText())) {
-            sendMessage("Место ближайшей игры успешно изменено");
-            return;
-        }
-        sendMessage("Не удалось изменить место ближайшей игры");
-    }
-
-    private void setMaxPlayers(Message message) {
-        if (dayService.setMaxPlayers(message.getText())) {
-            sendMessage("Кол-во игроков на ближайшую игру успешно изменено");
-            return;
-        }
-        sendMessage("Не удалось изменить кол-во игроков на ближайшую игру");
-    }
-
-    private void setDuration(Message message) {
-        if (dayService.setDuration(message.getText())) {
-            sendMessage("Длительность ближайшей игры успешно изменена");
-            return;
-        }
-        sendMessage("Не удалось изменить длительность ближайшей игры");
-    }
-
-    private boolean isSetMaxPlayersCommand(Message message) {
-        return message.getText().toUpperCase().startsWith(Constants.MAX_PLAYERS) && message.getText().length() > Constants.MAX_PLAYERS.length();
-    }
-
-    private boolean isSetPlaceCommand(Message message) {
-        return message.getText().toUpperCase().startsWith(Constants.PLACE) && message.getText().length() > Constants.PLACE.length();
-    }
-
-    private boolean isSetDurationCommand(Message message) {
-        return message.getText().toUpperCase().startsWith(Constants.DURATION) && message.getText().length() > Constants.DURATION.length();
     }
 
     private boolean isDayUpdate() {
@@ -301,7 +248,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         isReadyToSet = false;
         isTeamReportSent = false;
         sendMessage(getFrom(message) + " обновил расписание" + System.lineSeparator() + "Новое расписание:" + System.lineSeparator() + FOOTBALL_DAY);
-        processCheckInValidation(false);
+        processCheckInValidation();
     }
 
     private boolean isIgnoreInterrogation() {
@@ -375,10 +322,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                         "'-n' - Минусуешь n друзей (1-9)" + System.lineSeparator()) +
                 "'Состав' - Узнать состав" + System.lineSeparator() +
                 "'Сброс' - Сброс состава" + System.lineSeparator() +
-                "'Расписание' - Указать дни и время" + System.lineSeparator() +
-                "'/Место XXX' - Указать место проведения ближайшей игры, можно ссылку на карту" + System.lineSeparator() +
-                "'/Длительность X' - Указать продолжительность ближайшей игры" + System.lineSeparator() +
-                "'/Игроки X' - Указать максимальное кол-во игроков для ближайшей игры";
+                "'Расписание' - Указать дни и время" + System.lineSeparator();
     }
 
     private String getFrom(Message message) {
